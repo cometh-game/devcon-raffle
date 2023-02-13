@@ -6,7 +6,7 @@ steps:
   image: node:16
   commands:
   - yarn install
-  - yarn build
+  - VITE_NETWORK=Mumbai yarn build --mode development
   volumes:
   - name: dist
     path: /packages/frontend/dist

@@ -33,7 +33,7 @@ export const InfoAccordion = () => {
             <br />
             <br />
             This year, we wanted to try something different, so we are experimenting with an on-chain Auction & Raffle
-            to sell a <Italic>portion</Italic> of Devcon tickets.
+            to sell a <Italic>portion</Italic> of EthCC tickets.
           </StyledContent>
         </Accordion.Item>
 
@@ -42,12 +42,12 @@ export const InfoAccordion = () => {
             <AccordionStyledTrigger heading="How to participate in the Auction & Raffle?" />
           </StyledHeader>
           <StyledContent>
-            Join the contest by submitting a bid for the ticket based on the amount you would value having a Devcon
+            Join the contest by submitting a bid for the ticket based on the amount you would value having a EthCC
             ticket. Bid high to compete for the 20 tickets distributed in the auction, or be entered into the raffle for
             a chance to buy a ticket at the reserve price. You need to bid at least the reserve price, which is set to
-            the price of a standard Devcon ticket at time of publication: <Bold>{reservePrice} ETH.</Bold> Please note
+            the price of a standard EthCC ticket at time of publication: <Bold>{reservePrice} ETH.</Bold> Please note
             there is a one-person-one-bid rule in place. You will need to submit your name at check-out, and we will
-            check IDs at Devcon to verify that the participant is the ticket holder.
+            check IDs at EthCC to verify that the participant is the ticket holder.
           </StyledContent>
         </Accordion.Item>
 
@@ -56,10 +56,10 @@ export const InfoAccordion = () => {
             <AccordionStyledTrigger heading="ELI5 plz?" />
           </StyledHeader>
           <StyledContent>
-            Place a bid of at least {reservePrice} ETH for a chance to win a Devcon ticket. If your bid is in the top{' '}
-            {auctionWinnersCount}, you will win a Devcon ticket in exchange for the amount you paid in your bid. At any
+            Place a bid of at least {reservePrice} ETH for a chance to win a EthCC ticket. If your bid is in the top{' '}
+            {auctionWinnersCount}, you will win a EthCC ticket in exchange for the amount you paid in your bid. At any
             point, you can top up your bid if you want. If your bid is not in the top {auctionWinnersCount}, you will be
-            entered into a raffle and may be randomly chosen to win a Devcon ticket — if you were randomly selected in
+            entered into a raffle and may be randomly chosen to win a EthCC ticket — if you were randomly selected in
             the Raffle & bid more than the reserve price, you can withdraw the difference. If you do not win, you can
             withdraw your entire bid, minus a 2% sybil-resistance fee.
           </StyledContent>
@@ -72,7 +72,7 @@ export const InfoAccordion = () => {
           <StyledContent>
             <RuleText>
               The total number of {totalCount} tickets will be divided between the auction and the raffle pools. All
-              winners will receive a voucher code that must be redeemed for a Devcon ticket.
+              winners will receive a voucher code that must be redeemed for a EthCC ticket.
             </RuleText>
             <Rule
               heading={`Auction pool: ${auctionWinnersCount} tickets`}
@@ -88,7 +88,7 @@ export const InfoAccordion = () => {
             />
             <Rule
               heading="Golden Ticket: 1 ticket"
-              rule="One lucky bidder from the raffle pool will receive a ticket for Devcon 6 totally for free! The Golden Ticket winner will be able to claim the whole amount of their bid after the raffle is settled."
+              rule="One lucky bidder from the raffle pool will receive a ticket for EthCC 6 totally for free! The Golden Ticket winner will be able to claim the whole amount of their bid after the raffle is settled."
             />
             <Rule
               heading="No luck?"
@@ -168,7 +168,7 @@ export const InfoAccordion = () => {
               <Bold>until {formatEndDate(redeemTimestamp)}</Bold>). Once you have input your voucher code into our
               ticket portal, you will go through the standard ticket checkout flow. You can go to{' '}
               <Link href="https://tickets.devcon.org/">our ticket shop here</Link> to redeem your voucher code for a
-              Devcon 6 ticket. See you at the conference!
+              EthCC 6 ticket. See you at the conference!
             </span>
           </StyledContent>
         </Accordion.Item>

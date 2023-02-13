@@ -7,6 +7,7 @@ import { commonUseDAppConfig, Config } from './config'
 import { getDateEnv, getStringEnv } from './getEnv'
 
 export function getLocalDevConfig(): Config {
+  console.log('Hardhat chain id', Hardhat.chainId)
   return {
     useDAppConfig: {
       ...commonUseDAppConfig,
@@ -18,7 +19,7 @@ export function getLocalDevConfig(): Config {
     addresses: ADDRESSES,
     backendUrl: 'http://localhost:3001',
     portisDAppID: getStringEnv('VITE_PORTIS_DAPP_ID') || '',
-    dappName: 'Devcon 6 Auction & Raffle (LOCAL DEV)',
+    dappName: 'EthCC 6 Auction & Raffle (LOCAL DEV)',
     voucherRedeemDeadline: getDateEnv('VITE_VOUCHER_REDEEM_DEADLINE'),
   }
 }

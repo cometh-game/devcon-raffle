@@ -61,7 +61,7 @@ function getWinText(winType: WinType) {
     case WinType.Auction:
       return (
         <span>
-          Your bid was in the top 20, so you <b>won a ticket</b> to Devcon 6!
+          Your bid was in the top 20, so you <b>won a ticket</b> to EthCC 6!
         </span>
       )
     case WinType.Raffle:

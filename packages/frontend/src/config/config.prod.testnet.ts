@@ -18,7 +18,7 @@ export function getTestnetProdConfig(): Config {
     addresses: getAddresses(),
     backendUrl: getStringEnv('VITE_BACKEND_URL') || '',
     portisDAppID: getStringEnv('VITE_PORTIS_DAPP_ID') || '',
-    dappName: 'Devcon 6 Auction & Raffle (TESTNET)',
+    dappName: 'EthCC 6 Auction & Raffle (TESTNET)',
     voucherRedeemDeadline: getDateEnv('VITE_VOUCHER_REDEEM_DEADLINE'),
   }
 }

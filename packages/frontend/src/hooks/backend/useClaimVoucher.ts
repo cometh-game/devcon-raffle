@@ -13,7 +13,7 @@ export function useClaimVoucher() {
   return useCallback(
     async (nonce: string) => {
       if (library && account) {
-        const signature = await signClaimVoucher({ library, account, devcon, chainId, nonce })
+        const signature = await signClaimVoucher({ library: library as JsonRpcProvider, account, devcon, chainId, nonce })
         if (!signature) {
           return { error: 'Could not sign message.' }
         }

@@ -1,4 +1,4 @@
-import { ArbitrumRinkeby } from '@usedapp/core'
+import { Mumbai } from '@usedapp/core'
 import { providerWithInterval } from 'src/constants/nodeUrls'
 import { POLLING_INTERVAL } from 'src/constants/pollingInterval'
 
@@ -10,9 +10,9 @@ export function getTestnetDevConfig(): Config {
   return {
     useDAppConfig: {
       ...commonUseDAppConfig,
-      readOnlyChainId: ArbitrumRinkeby.chainId,
-      readOnlyUrls: providerWithInterval(ArbitrumRinkeby.chainId, POLLING_INTERVAL),
-      networks: [ArbitrumRinkeby],
+      readOnlyChainId: Mumbai.chainId,
+      readOnlyUrls: providerWithInterval(Mumbai.chainId, POLLING_INTERVAL),
+      networks: [Mumbai],
       pollingInterval: POLLING_INTERVAL,
     },
     addresses: getAddresses(),

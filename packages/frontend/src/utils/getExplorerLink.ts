@@ -1,5 +1,5 @@
 import { Arbitrum, ChainId } from '@usedapp/core'
-import { getChainById } from '@usedapp/core/internal'
+import { getChainById } from '@usedapp/core/dist/esm/src/helpers'
 
 export function getExplorerAddressLink(chainId: ChainId, address: string) {
   const chain = getChain(chainId)

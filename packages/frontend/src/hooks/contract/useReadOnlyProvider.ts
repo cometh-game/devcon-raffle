@@ -1,5 +1,5 @@
 import { BaseProvider } from '@ethersproject/providers'
-import { useReadonlyNetworks } from '@usedapp/core/internal'
+import { useReadonlyNetworks } from '@usedapp/core/dist/esm/src/providers'
 import { useReadOnlyChainId } from 'src/hooks/chainId/useReadOnlyChainId'
 
 export function useReadOnlyProvider(): BaseProvider {

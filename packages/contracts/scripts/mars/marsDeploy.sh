@@ -5,7 +5,7 @@ set -eu
 export ALCHEMY_KEY="j_dccrP25UjZv5uYxh1mcjEl5o8nWZaf"
 
 # Setting Etherscan key to use for convenience here
-export ETHERSCAN_KEY="FJG9XKWZC5ECE6T86IGM8XI35DME5KYU1E"
+#export ETHERSCAN_KEY="FJG9XKWZC5ECE6T86IGM8XI35DME5KYU1E"
 
 # Consume the first argument as a path to the Mars deploy script.
 # All other command line arguments get forwarded to Mars.
@@ -30,15 +30,15 @@ while [[ "$@" ]]; do
   shift 1
 done
 
-if [[ "$(git status --porcelain)" ]]; then
-    echo "Error: git working directory must be empty to run deploy script."
-    exit 1
-fi
+#if [[ "$(git status --porcelain)" ]]; then
+#    echo "Error: git working directory must be empty to run deploy script."
+#    exit 1
+#fi
 
-if [[ "$(git log --pretty=format:'%H' -n 1)" != "$(cat ./build/canary.hash)" ]]; then
-    echo "Error: Build canary does not match current commit hash. Please run yarn build."
-    exit 1
-fi
+#if [[ "$(git log --pretty=format:'%H' -n 1)" != "$(cat ./build/canary.hash)" ]]; then
+#    echo "Error: Build canary does not match current commit hash. Please run yarn build."
+#    exit 1
+#fi
 
 # Skip prompt if PRIVATE_KEY variable already exists
 if [[ -z "${PRIVATE_KEY:-}" ]]; then

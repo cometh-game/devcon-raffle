@@ -1,6 +1,6 @@
 import { contract, deploy } from 'ethereum-mars'
 import { AuctionRaffle } from '../../build/artifacts'
-import { config } from './deploymentConfig'
+import { config } from '../deploymentConfig'
 
 deploy({ verify: true }, deployAuctionRaffle)
 

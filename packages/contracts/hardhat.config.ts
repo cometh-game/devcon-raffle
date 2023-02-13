@@ -1,5 +1,6 @@
-import 'hardhat-typechain'
-import '@nomiclabs/hardhat-waffle'
+import '@nomicfoundation/hardhat-toolbox'
+import 'hardhat-deploy'
+import '@nomiclabs/hardhat-ethers'
 import './abi-exporter'
 import 'tsconfig-paths/register'
 import 'hardhat-gas-reporter'
@@ -36,6 +37,10 @@ module.exports = {
         count: 120
       },
     },
+    mumbai: {
+      url: 'https://rpc.ankr.com/polygon_mumbai',
+      accounts: [process.env.DEPLOYER || zeroPrivateKey],
+    },
     rinkeby: {
       url: 'https://rinkeby.arbitrum.io/rpc',
       accounts: [process.env.DEPLOYER || zeroPrivateKey]
@@ -51,6 +56,9 @@ module.exports = {
   typechain: {
     outDir: 'build/types',
     target: 'ethers-v5'
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   solidity: {
     compilers: [compiler]

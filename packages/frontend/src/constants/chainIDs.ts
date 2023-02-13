@@ -1,6 +1,6 @@
 import { ChainId } from '@usedapp/core'
 
-const supportedChainIds = [ChainId.Arbitrum, ChainId.ArbitrumRinkeby, ChainId.Hardhat] as const
+const supportedChainIds = [ChainId.Arbitrum, ChainId.ArbitrumRinkeby, ChainId.Mumbai, ChainId.Hardhat] as const
 
 export type SupportedChainId = typeof supportedChainIds[number]
 

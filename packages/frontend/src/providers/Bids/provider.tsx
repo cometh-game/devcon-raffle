@@ -1,5 +1,5 @@
 import { AuctionRaffle } from '@devcon-raffle/contracts'
-import { useBlockNumbers } from '@usedapp/core/internal'
+import { useBlockNumbers } from '@usedapp/core'
 import { Dispatch, ReactNode, useEffect, useReducer, useState } from 'react'
 import { POLLING_INTERVAL } from 'src/constants/pollingInterval'
 import { useChainId } from 'src/hooks/chainId/useChainId'

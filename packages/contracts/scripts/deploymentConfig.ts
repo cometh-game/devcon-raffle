@@ -13,12 +13,12 @@ interface DeploymentConfig {
 }
 
 export const config: DeploymentConfig = {
-  initialOwner: '0x511ECC4c955626DDaD88f20493E39E71be8133B6',
-  biddingStartTime: 1657008000, // Jul 05 2022 08:00:00 UTC
-  biddingEndTime: 1657785540, // Jul 14 2022 07:59:00 UTC
-  claimingEndTime: 1673683140, // Jan 14 2023 07:59:00 UTC
+  initialOwner: '0x472Afd5a5303ac2799475687e943bbA72846BD6b',
+  biddingStartTime: 1676300400, // Mon Feb 13 2023 15:00:00 GMT+0000
+  biddingEndTime: 1676473200, // Wed Feb 15 2023 15:00:00 GMT+0000
+  claimingEndTime: 1676646000, // Fri Feb 17 2023 15:00:00 GMT+0000
   auctionWinnersCount: 20,
   raffleWinnersCount: 80,
-  reservePrice: utils.parseEther('0.25'),
-  minBidIncrement: utils.parseEther('0.01'),
+  reservePrice: utils.parseEther('0.01'),
+  minBidIncrement: utils.parseEther('0.001'),
 }

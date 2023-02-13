@@ -1,4 +1,4 @@
-import { useDebounce } from '@usedapp/core/internal'
+import { useDebounce } from '@usedapp/core/dist/esm/src/hooks'
 import { useEffect, useState } from 'react'
 import { CloseButton } from 'src/components/Buttons'
 import { SearchIcon } from 'src/components/Icons'

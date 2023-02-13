@@ -35,7 +35,7 @@ export function useSwitchChain() {
 
   return useCallback(async () => {
     if (library !== undefined) {
-      await switchOrAddChain(library, chainId)
+      await switchOrAddChain(library as JsonRpcProvider, chainId)
     }
   }, [library, chainId])
 }

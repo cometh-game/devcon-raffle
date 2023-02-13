@@ -15,12 +15,12 @@
   "dependencies": {
     "@coinbase/wallet-sdk": "^3.0.11",
     "@devcon-raffle/contracts": "0.0.1",
-    "@ethersproject/abi": "^5.6.0",
-    "@ethersproject/bignumber": "^5.5.0",
-    "@ethersproject/constants": "^5.6.0",
-    "@ethersproject/hash": "^5.6.0",
-    "@ethersproject/providers": "~5.6.4",
-    "@ethersproject/units": "^5.6.0",
+    "@ethersproject/abi": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
+    "@ethersproject/constants": "^5.7.0",
+    "@ethersproject/hash": "^5.7.0",
+    "@ethersproject/providers": "~5.7.2",
+    "@ethersproject/units": "^5.7.0",
     "@metamask/jazzicon": "^2.0.0",
     "@portis/web3": "^4.0.7",
     "@radix-ui/react-accordion": "^0.1.6",
@@ -29,7 +29,7 @@
     "@radix-ui/react-toast": "^0.1.1",
     "@radix-ui/react-tooltip": "^0.1.7",
     "@types/styled-components": "^5.1.24",
-    "@usedapp/core": "^1.0.2",
+    "@usedapp/core": "^1.2.2",
     "@walletconnect/web3-provider": "^1.7.8",
     "copy-to-clipboard": "^3.3.1",
     "immutable": "^4.0.0",
@@ -68,6 +68,6 @@
     "rollup-plugin-polyfill-node": "^0.9.0",
     "typescript": "~4.5.4",
     "util": "^0.12.4",
-    "vite": "^2.8.0"
+    "vite": "^4.1.1"
   }
 }

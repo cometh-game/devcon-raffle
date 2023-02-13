@@ -1,0 +1,33 @@
+kind: pipeline
+type: docker
+name: prod release
+steps:
+- name: build frontend dist
+  image: node:16
+  commands:
+  - yarn install
+  - yarn build
+  volumes:
+  - name: dist
+    path: /packages/frontend/dist
+- name:  frontend gcs upload
+  image: gcr.io/infra-342714/gcloud:latest
+  commands:
+  - /run.sh
+  - gsutil -m cp -r dist/* gs://cometh-devcon-raffle-poc
+  volumes:
+  - name: dist
+    path: /dist
+  environment:
+    GCP_SA:
+      from_secret: google_credentials
+trigger:
+  branch:
+  - master
+  event:
+  - push
+image_pull_secrets:
+- dockerconfigjson
+volumes:
+- name: dist
+  temp: {}

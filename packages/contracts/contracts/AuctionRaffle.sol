@@ -5,6 +5,7 @@ pragma solidity 0.8.10;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 import "./Config.sol";
 import "./models/BidModel.sol";
@@ -100,6 +101,44 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
      * @dev Assigns a unique bidderID to the sender address.
      */
     function bid() external payable onlyExternalTransactions onlyInState(State.BIDDING_OPEN) {
+      makeBid();
+    }
+
+    /***
+     * @notice Places a new bid or bumps an existing bid. It applies a discount depending on the
+     * amount of POAPs the msg.sender. The amout of POAPs owned is proved using a Merkle Proof.
+     * @dev Applies a discount on the msg.sender's bid. We need to store each bidder's discount
+     * so that we can easily compute claimable proceeds when settlement is done.
+     * If msg.sender makes multiple bids, the highest discount is kept.
+     */
+    function bidWithPOAP(
+      uint256 poapAmount,
+      bytes32[] calldata proof
+    ) external payable onlyExternalTransactions onlyInState(State.BIDDING_OPEN) {
+      require(MerkleProof.verify(proof, poapRoot, keccak256(abi.encode(msg.sender, poapAmount))), "AuctionRaffle: POAP proof invalid");
+      makeBid();
+
+      // after making a bid, bidder exists for `msg.sender`
+      Bid storage bidder = _bids[msg.sender];
+      uint256 oldDiscount = bidder.discount;
+
+      // discount is 10% (or 15%) of the reserve price, depending on the amount of POAPs msg.sender owns
+      uint256 reservePrice = _reservePrice;
+      uint256 discount = reservePrice * 10 / 100;
+      if (poapAmount >= 3) {
+        discount = reservePrice * 20 / 100;
+      }
+
+      if (discount > oldDiscount) {
+        bidder.discount = discount;
+      }
+    }
+
+    /***
+     * @notice Places a new bid or bumps an existing bid.
+     * @dev Assigns a unique bidderID to the sender address.
+     */
+    function makeBid() private {
         Bid storage bidder = _bids[msg.sender];
         if (bidder.amount == 0) {
             require(msg.value >= _reservePrice, "AuctionRaffle: bid amount is below reserve price");
@@ -207,7 +246,9 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
         bidder.claimed = true;
         uint256 claimAmount;
         if (bidder.winType == WinType.RAFFLE) {
-            claimAmount = bidder.amount - _reservePrice;
+            // discount = 0 if no POAP is owned
+            // discount = a % of _reservePrice so subtracting is safe
+            claimAmount = bidder.amount - (_reservePrice - bidder.discount);
         } else if (bidder.winType == WinType.GOLDEN_TICKET) {
             claimAmount = bidder.amount;
         } else if (bidder.winType == WinType.LOSS) {
@@ -242,12 +283,21 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
             totalAmount += _bids[bidderAddress].amount;
         }
 
+        // becausse there could be discounts applied on raffle winners, we need to subtract discounts
         uint256 raffleWinnersCount = _raffleWinnersCount - 1;
         if (biddersCount <= raffleWinnersCount) {
             raffleWinnersCount = biddersCount - 1;
         }
+
         totalAmount += raffleWinnersCount * _reservePrice;
 
+        uint256 discounts = 0;
+        for (uint256 i = 0; i < raffleWinnersCount; ++i) {
+            address bidderAddress = _bidders[_raffleWinners[i]];
+            discounts += _bids[bidderAddress].discount;
+        }
+
+        totalAmount -= discounts;
         payable(owner()).transfer(totalAmount);
     }
 

@@ -24,6 +24,8 @@ abstract contract Config {
     uint256 immutable _reservePrice;
     uint256 immutable _minBidIncrement;
 
+    bytes32 immutable public poapRoot;
+
     constructor(
         uint256 biddingStartTime_,
         uint256 biddingEndTime_,
@@ -56,6 +58,7 @@ abstract contract Config {
         _raffleWinnersCount = raffleWinnersCount_;
         _reservePrice = reservePrice_;
         _minBidIncrement = minBidIncrement_;
+        poapRoot = bytes32(0);
     }
 
     function biddingStartTime() external view returns (uint256) {

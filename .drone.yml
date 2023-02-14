@@ -14,7 +14,7 @@ steps:
   image: gcr.io/infra-342714/gcloud:latest
   commands:
   - /run.sh
-  - gsutil -m cp -r dist/* gs://cometh-devcon-raffle-poc
+  - gsutil -m cp -r /dist/* gs://cometh-devcon-raffle-poc
   volumes:
   - name: dist
     path: /dist

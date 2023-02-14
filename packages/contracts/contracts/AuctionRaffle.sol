@@ -70,7 +70,8 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
         uint256 auctionWinnersCount,
         uint256 raffleWinnersCount,
         uint256 reservePrice,
-        uint256 minBidIncrement
+        uint256 minBidIncrement,
+        bytes32 discountRoot
     )
         Config(
             biddingStartTime,
@@ -79,7 +80,8 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
             auctionWinnersCount,
             raffleWinnersCount,
             reservePrice,
-            minBidIncrement
+            minBidIncrement,
+            discountRoot
         )
         Ownable()
     {
@@ -105,29 +107,31 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
     }
 
     /***
-     * @notice Places a new bid or bumps an existing bid. It applies a discount depending on the
-     * amount of POAPs the msg.sender. The amout of POAPs owned is proved using a Merkle Proof.
+     * @notice Places a new bid or bumps an existing bid with a discount.
+     * The discount is proved using a Merkle Proof.
      * @dev Applies a discount on the msg.sender's bid. We need to store each bidder's discount
      * so that we can easily compute claimable proceeds when settlement is done.
      * If msg.sender makes multiple bids, the highest discount is kept.
      */
-    function bidWithPOAP(
-      uint256 poapAmount,
-      bytes32[] calldata proof
+    function bidWithDiscount(
+      uint256 discountPercentage,
+      bytes32[] memory proof
     ) external payable onlyExternalTransactions onlyInState(State.BIDDING_OPEN) {
-      require(MerkleProof.verify(proof, poapRoot, keccak256(abi.encode(msg.sender, poapAmount))), "AuctionRaffle: POAP proof invalid");
+      require(discountPercentage <= 100, "AuctionRaffle: discount must be at most 100%");
+
+      bytes32 leaf = keccak256(abi.encode(msg.sender, discountPercentage));
+      require(
+        MerkleProof.verify(proof, discountRoot, leaf),
+        "AuctionRaffle: discount proof invalid"
+      );
       makeBid();
 
       // after making a bid, bidder exists for `msg.sender`
       Bid storage bidder = _bids[msg.sender];
       uint256 oldDiscount = bidder.discount;
 
-      // discount is 10% (or 15%) of the reserve price, depending on the amount of POAPs msg.sender owns
       uint256 reservePrice = _reservePrice;
-      uint256 discount = reservePrice * 10 / 100;
-      if (poapAmount >= 3) {
-        discount = reservePrice * 20 / 100;
-      }
+      uint256 discount = (reservePrice * discountPercentage) / 100;
 
       if (discount > oldDiscount) {
         bidder.discount = discount;
@@ -246,7 +250,7 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
         bidder.claimed = true;
         uint256 claimAmount;
         if (bidder.winType == WinType.RAFFLE) {
-            // discount = 0 if no POAP is owned
+            // discount = 0 if no discount to apply
             // discount = a % of _reservePrice so subtracting is safe
             claimAmount = bidder.amount - (_reservePrice - bidder.discount);
         } else if (bidder.winType == WinType.GOLDEN_TICKET) {

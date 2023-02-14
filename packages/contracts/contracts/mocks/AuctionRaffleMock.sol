@@ -13,7 +13,8 @@ contract AuctionRaffleMock is AuctionRaffle {
         uint256 auctionWinnersCount,
         uint256 raffleWinnersCount,
         uint256 reservePrice,
-        uint256 minBidIncrement
+        uint256 minBidIncrement,
+        bytes32 discountRoot
     )
         AuctionRaffle(
             initialOwner,
@@ -23,7 +24,8 @@ contract AuctionRaffleMock is AuctionRaffle {
             auctionWinnersCount,
             raffleWinnersCount,
             reservePrice,
-            minBidIncrement
+            minBidIncrement,
+            discountRoot
         )
     {}
 

@@ -1,3 +1,4 @@
+import { MerkleTree } from 'merkletreejs'
 import { setupFixtureLoader } from '../setup'
 import { expect } from 'chai'
 import {
@@ -7,6 +8,7 @@ import {
   minBidIncrement,
   reservePrice,
 } from 'fixtures/auctionRaffleFixture'
+import { merkleTreeFixture, hashDiscount } from 'fixtures/merkleTreeFixture'
 import { AuctionRaffleMock, ExampleToken } from 'contracts'
 import { getLatestBlockTimestamp } from 'utils/getLatestBlockTimestamp'
 import { Provider } from '@ethersproject/providers'
@@ -31,11 +33,72 @@ describe('AuctionRaffle', function () {
   let auctionRaffleAsOwner: AuctionRaffleMock
   let bidderAddress: string
   let wallets: Wallet[]
+  let discountTree: MerkleTree 
+  let discounts
+  let bidderProof: string[]
 
   beforeEach(async function () {
-    ({ provider, auctionRaffle, wallets } = await loadFixture(auctionRaffleFixture))
+    ({ provider, auctionRaffle, wallets, discountTree, discounts } = await loadFixture(configuredAuctionRaffleFixture({})))
     auctionRaffleAsOwner = auctionRaffle.connect(owner())
     bidderAddress = await auctionRaffle.signer.getAddress()
+    bidderProof = discountTree.getHexProof(hashDiscount(bidderAddress, discounts[0]))
+  })
+
+  describe('bidWithDiscount', function () {
+    it('should revert if proof is invalid', async function () {
+      const invalidDiscount = 100
+
+      await expect(auctionRaffle.bidWithDiscount(invalidDiscount, bidderProof)).to.be.revertedWith('AuctionRaffle: discount proof invalid')
+    })
+
+    it('should revert if discount is greater than 100', async function () {
+      const invalidDiscount = 110
+
+      await expect(auctionRaffle.bidWithDiscount(invalidDiscount, bidderProof)).to.be.revertedWith('AuctionRaffle: discount must be at most 100%')
+    })
+
+    it('should bid with discount', async function () {
+      await auctionRaffle.bidWithDiscount(discounts[0], bidderProof, { value: reservePrice })
+
+      const bid = await auctionRaffle.getBid(bidderAddress)
+
+      expect(bid.discount).to.equal(parseEther('0.05'))
+    })
+
+    it('should increase discount', async function () {
+      await auctionRaffle.bidWithDiscount(discounts[0], bidderProof, { value: reservePrice })
+
+      const leaf = hashDiscount(bidderAddress, discounts[1])
+      const proof = discountTree.getHexProof(leaf)
+      await auctionRaffle.bidWithDiscount(discounts[1], proof, { value: reservePrice, gasLimit: 1000000 })
+
+      const bid = await auctionRaffle.getBid(bidderAddress)
+      expect(bid.discount).to.equal(parseEther('0.10'))
+    })
+
+    it('should keep highest discount', async function () {
+      const proof = discountTree.getHexProof(hashDiscount(bidderAddress, discounts[1]))
+      await auctionRaffle.bidWithDiscount(discounts[1], proof, { value: reservePrice })
+
+      await auctionRaffle.bidWithDiscount(discounts[0], bidderProof, { value: reservePrice })
+
+      const bid = await auctionRaffle.getBid(bidderAddress)
+      expect(bid.discount).to.equal(parseEther('0.10'))
+    })
+
+    describe('when bidder already has a bid', async function () {
+      beforeEach(async function () {
+        await auctionRaffle.bid({ value: reservePrice })
+      })
+
+      it('should bid with discount', async function () {
+        await auctionRaffle.bidWithDiscount(discounts[0], bidderProof, { value: reservePrice })
+
+        const bid = await auctionRaffle.getBid(bidderAddress)
+
+        expect(bid.discount).to.equal(parseEther('0.05'))
+      })
+    })
   })
 
   describe('bid', function () {
@@ -81,6 +144,7 @@ describe('AuctionRaffle', function () {
       expect(bid.amount).to.be.equal(reservePrice)
       expect(bid.winType).to.be.equal(WinType.loss)
       expect(bid.claimed).to.be.false
+      expect(bid.discount).to.equal(0)
     })
 
     it('saves bidder address', async function () {
@@ -100,6 +164,17 @@ describe('AuctionRaffle', function () {
       await auctionRaffle.bid({ value: reservePrice })
 
       expect(await auctionRaffle.getBiddersCount()).to.be.equal(1)
+    })
+
+    describe('when user already has discount', function () {
+      it('should increase bid and add discount', async function () {
+        await auctionRaffle.bidWithDiscount(discounts[0], bidderProof, { value: reservePrice })
+
+        const bid = await auctionRaffle.getBid(bidderAddress)
+
+        expect(bid.amount).to.equal(parseEther('0.5'))
+        expect(bid.discount).to.equal(parseEther('0.05'))
+      })
     })
 
     describe('when heap is full', function () {
@@ -631,6 +706,23 @@ describe('AuctionRaffle', function () {
       expect(await provider.getBalance(bidderAddress)).to.be.equal(bidderBalanceBeforeClaim.add(reservePrice))
     })
 
+    it('transfers remaining funds plus discount for raffle winner with discount', async function () {
+      await bidsWithDiscount(9, discounts[0]) // place 9 bids with discount = reservePrice
+      await bidAsWallet(owner(), reservePrice) // bumps owner bid to become auction winner
+      await bidAndSettleRaffle(9) // bumps all 9 bids
+
+      const raffleBid = await getBidByWinType(9, WinType.raffle) // get any raffle winner
+      const bidderAddress = await auctionRaffleAsOwner.getBidderAddress(raffleBid.bidderID)
+
+      const bidderBalanceBeforeClaim = await provider.getBalance(bidderAddress)
+      await auctionRaffleAsOwner.claim(raffleBid.bidderID)
+      const discount = parseEther('0.05')
+
+      const expected = bidderBalanceBeforeClaim.add(reservePrice.add(discount))
+      expect(await provider.getBalance(bidderAddress)).to.be.equal(expected)
+
+    })
+
     it('transfers bid funds for golden ticket winner', async function () {
       await bidAsWallet(owner(), reservePrice)
       await bidAndSettleRaffle(10)
@@ -677,6 +769,68 @@ describe('AuctionRaffle', function () {
 
         await expect(auctionRaffleAsOwner.claimProceeds())
           .to.be.revertedWith('AuctionRaffle: proceeds have already been claimed')
+      })
+    })
+
+    describe('when using discounts', function () {
+      const discount = parseEther('0.05')
+
+      describe('when biddersCount > (auctionWinnersCount + raffleWinnersCount)', function () {
+        it('transfers correct amount', async function () {
+          const auctionBidAmount = reservePrice.add(100)
+          await bidAsWallet(wallets[10], auctionBidAmount)
+          await bidDiscountAndSettleRaffle(10)
+
+          const claimAmount = auctionBidAmount.add(reservePrice.sub(discount).mul(7))
+          expect(await claimProceeds()).to.eq(claimAmount)
+        })
+      })
+
+      describe('when biddersCount == (auctionWinnersCount + raffleWinnersCount)', function () {
+        it('transfers correct amount', async function () {
+          ({ auctionRaffle } = await loadFixture(configuredAuctionRaffleFixture({ auctionWinnersCount: 2, raffleWinnersCount: 8 })))
+          auctionRaffleAsOwner = auctionRaffle.connect(owner())
+
+          const auctionBidAmount = reservePrice.add(100)
+          await bidAsWallet(wallets[8], auctionBidAmount)
+          await bidAsWallet(wallets[9], auctionBidAmount)
+          await bidDiscountAndSettleRaffle(8)
+
+          const claimAmount = auctionBidAmount.mul(2).add(reservePrice.sub(discount).mul(7))
+          expect(await claimProceeds()).to.eq(claimAmount)
+        })
+      })
+
+      describe('when raffleWinnersCount < biddersCount < (auctionWinnersCount + raffleWinnersCount)', function () {
+        it('transfers correct amount', async function () {
+          ({ auctionRaffle } = await loadFixture(configuredAuctionRaffleFixture({ auctionWinnersCount: 2, raffleWinnersCount: 8 })))
+          auctionRaffleAsOwner = auctionRaffle.connect(owner())
+
+          const auctionBidAmount = reservePrice.add(100)
+          await bidAsWallet(wallets[8], auctionBidAmount)
+          await bidDiscountAndSettleRaffle(8)
+
+          const claimAmount = auctionBidAmount.add(reservePrice.sub(discount).mul(7))
+          expect(await claimProceeds()).to.eq(claimAmount)
+        })
+      })
+
+      describe('when biddersCount == raffleWinnersCount', function () {
+        it('transfers correct amount', async function () {
+          await bidDiscountAndSettleRaffle(8)
+
+          const claimAmount = reservePrice.sub(discount).mul(7)
+          expect(await claimProceeds()).to.eq(claimAmount)
+        })
+      })
+
+      describe('when biddersCount < raffleWinnersCount', function () {
+        it('transfers correct amount', async function () {
+          await bidDiscountAndSettleRaffle(5)
+
+          const claimAmount = reservePrice.sub(discount).mul(4)
+          expect(await claimProceeds()).to.eq(claimAmount)
+        })
       })
     })
 
@@ -1080,6 +1234,15 @@ describe('AuctionRaffle', function () {
     })
   }
 
+  async function bidDiscountAndSettleRaffle(bidCount: number, randomNumbers?: BigNumberish[]): Promise<ContractTransaction> {
+    await bidsWithDiscount(bidCount, 10)
+    await endBidding(auctionRaffleAsOwner)
+    await settleAuction()
+
+    const numbers = randomNumbers || randomBigNumbers(1)
+    return auctionRaffleAsOwner.settleRaffle(numbers)
+  }
+
   async function bidAndSettleRaffle(bidCount: number, randomNumbers?: BigNumberish[]): Promise<ContractTransaction> {
     await bid(bidCount)
     await endBidding(auctionRaffleAsOwner)
@@ -1103,6 +1266,17 @@ describe('AuctionRaffle', function () {
     for (let i = 0; i < walletCount; i++) {
       await bidAsWallet(wallets[i], reservePrice)
     }
+  }
+
+  async function bidsWithDiscount(walletCount: number, discount: number) {
+    for (let i = 0; i < walletCount; i++) {
+      await bidWithDiscount(wallets[i], discount, reservePrice)
+    }
+  }
+
+  async function bidWithDiscount(wallet: Wallet, discount: number, value: BigNumberish) {
+    const proof = discountTree.getHexProof(hashDiscount(wallet.address, discount))
+    await auctionRaffle.connect(wallet).bidWithDiscount(discount, proof, { value })
   }
 
   async function bidAsWallet(wallet: Wallet, value: BigNumberish) {

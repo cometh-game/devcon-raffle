@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: push build
+name: develop push
 steps:
     - name: compile
       image: node:16
@@ -48,6 +48,8 @@ steps:
       when:
           status: [success, failure]
 trigger:
+    branch: 
+        - develop
     event:
         - push
 

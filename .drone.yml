@@ -21,32 +21,32 @@ steps:
           json_key:
               from_secret: google_credentials
 
-    # - name: rolling update
-    #   image: gcr.io/infra-342714/app-rolling-update:latest
-    #   environment:
-    #       GCP_SA:
-    #           from_secret: google_credentials
-    #       SERVICE: devcon-raffle
-    #       ENVIRONMENT: develop
+    - name: rolling update
+      image: gcr.io/infra-342714/app-rolling-update:latest
+      environment:
+          GCP_SA:
+              from_secret: google_credentials
+          SERVICE: devcon-raffle
+          ENVIRONMENT: develop
 
-    # - name: discord notification
-    #   image: appleboy/drone-discord
-    #   settings:
-    #       webhook_id:
-    #           from_secret: discord_webhook_id
-    #       webhook_token:
-    #           from_secret: discord_webhook_token
-    #       username: drone
-    #       message: >
-    #           {{#success build.status}}
-    #             build push and rolling update for develop {{repo.name}} succeeded.
-    #             {{build.link}}
-    #           {{else}}
-    #              build push and rolling update for develop {{repo.name}} failed. Fix me please.
-    #             {{build.link}}
-    #           {{/success}}
-    #   when:
-    #       status: [success, failure]
+    - name: discord notification
+      image: appleboy/drone-discord
+      settings:
+          webhook_id:
+              from_secret: discord_webhook_id
+          webhook_token:
+              from_secret: discord_webhook_token
+          username: drone
+          message: >
+              {{#success build.status}}
+                build push and rolling update for develop {{repo.name}} succeeded.
+                {{build.link}}
+              {{else}}
+                 build push and rolling update for develop {{repo.name}} failed. Fix me please.
+                {{build.link}}
+              {{/success}}
+      when:
+          status: [success, failure]
 trigger:
     event:
         - push

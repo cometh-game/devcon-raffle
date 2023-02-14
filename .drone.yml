@@ -7,10 +7,6 @@ steps:
       commands:
           - yarn install
           - yarn build --mode development
-          - cp -r packages/frontend/dist/* /dist
-      volumes:
-          - name: dist
-            path: /dist
       environment:
           VITE_NETWORK: 'Mumbai'
 
@@ -57,7 +53,3 @@ trigger:
 
 image_pull_secrets:
     - dockerconfigjson
-
-volumes:
-- name: dist
-  temp: {}

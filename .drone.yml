@@ -9,15 +9,16 @@ steps:
           - yarn build --mode development
       volumes:
           - name: dist
-            path: packages/frontend/dist
+            path: /dist
       environment:
+          BUILD_PATH: '/dist'
           VITE_NETWORK: 'Mumbai'
 
     - name: build and push
       image: plugins/gcr
       volumes:
           - name: dist
-            path: packages/frontend/dist
+            path: /dist
       settings:
           dockerfile: Dockerfile
           registry: gcr.io/infra-342714

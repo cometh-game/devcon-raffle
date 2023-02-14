@@ -1,33 +1,65 @@
 kind: pipeline
 type: docker
-name: static bucket poc
+name: push build
 steps:
-- name: build frontend dist
-  image: node:16
-  commands:
-  - yarn install
-  - VITE_NETWORK=Mumbai yarn build --mode development
-  volumes:
-  - name: dist
-    path: /packages/frontend/dist
-- name:  frontend gcs upload
-  image: gcr.io/infra-342714/gcloud:latest
-  commands:
-  - /run.sh
-  - gsutil -m cp -r /dist/* gs://cometh-devcon-raffle-poc
-  volumes:
-  - name: dist
-    path: /dist
-  environment:
-    GCP_SA:
-      from_secret: google_credentials
+    - name: compile
+      image: node:16
+      commands:
+          - yarn install
+          - yarn build --mode development
+      volumes:
+          - name: dist
+            path: packages/frontend/dist
+      environment:
+          VITE_NETWORK: 'Mumbai'
+
+    - name: build and push
+      image: plugins/gcr
+      volumes:
+          - name: dist
+            path: packages/frontend/dist
+      settings:
+          dockerfile: Dockerfile
+          registry: gcr.io/infra-342714
+          repo: devcon-raffle
+          tags:
+              - develop
+          json_key:
+              from_secret: google_credentials
+
+    # - name: rolling update
+    #   image: gcr.io/infra-342714/app-rolling-update:latest
+    #   environment:
+    #       GCP_SA:
+    #           from_secret: google_credentials
+    #       SERVICE: devcon-raffle
+    #       ENVIRONMENT: develop
+
+    # - name: discord notification
+    #   image: appleboy/drone-discord
+    #   settings:
+    #       webhook_id:
+    #           from_secret: discord_webhook_id
+    #       webhook_token:
+    #           from_secret: discord_webhook_token
+    #       username: drone
+    #       message: >
+    #           {{#success build.status}}
+    #             build push and rolling update for develop {{repo.name}} succeeded.
+    #             {{build.link}}
+    #           {{else}}
+    #              build push and rolling update for develop {{repo.name}} failed. Fix me please.
+    #             {{build.link}}
+    #           {{/success}}
+    #   when:
+    #       status: [success, failure]
 trigger:
-  branch:
-  - master
-  event:
-  - push
+    event:
+        - push
+
 image_pull_secrets:
-- dockerconfigjson
+    - dockerconfigjson
+
 volumes:
 - name: dist
   temp: {}

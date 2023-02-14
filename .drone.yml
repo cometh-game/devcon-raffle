@@ -7,19 +7,15 @@ steps:
       commands:
           - yarn install
           - yarn build --mode development
+          - cp -r packages/frontend/dist/* /dist
       volumes:
           - name: dist
             path: /dist
       environment:
-          BUILD_PATH: '/dist'
           VITE_NETWORK: 'Mumbai'
 
     - name: build and push
       image: plugins/gcr
-      privileged: true
-      volumes:
-        - name: dist
-          path: /dist
       settings:
           dockerfile: Dockerfile
           registry: gcr.io/infra-342714

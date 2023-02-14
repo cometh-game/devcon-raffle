@@ -24,7 +24,7 @@ abstract contract Config {
     uint256 immutable _reservePrice;
     uint256 immutable _minBidIncrement;
 
-    bytes32 immutable public poapRoot;
+    bytes32 immutable public discountRoot;
 
     constructor(
         uint256 biddingStartTime_,
@@ -33,7 +33,8 @@ abstract contract Config {
         uint256 auctionWinnersCount_,
         uint256 raffleWinnersCount_,
         uint256 reservePrice_,
-        uint256 minBidIncrement_
+        uint256 minBidIncrement_,
+        bytes32 discountRoot_
     ) {
         require(auctionWinnersCount_ > 0, "Config: auction winners count must be greater than 0");
         require(raffleWinnersCount_ > 0, "Config: raffle winners count must be greater than 0");
@@ -58,7 +59,7 @@ abstract contract Config {
         _raffleWinnersCount = raffleWinnersCount_;
         _reservePrice = reservePrice_;
         _minBidIncrement = minBidIncrement_;
-        poapRoot = bytes32(0);
+        discountRoot = discountRoot_;
     }
 
     function biddingStartTime() external view returns (uint256) {

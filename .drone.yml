@@ -16,9 +16,6 @@ steps:
 
     - name: build and push
       image: plugins/gcr
-      volumes:
-          - name: dist
-            path: /dist
       settings:
           dockerfile: Dockerfile
           registry: gcr.io/infra-342714

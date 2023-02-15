@@ -1,3 +1,0 @@
-[submodule "backend"]
-	path = packages/backend
-	url = git@github.com:TrueFiEng/devcon-raffle-backend.git

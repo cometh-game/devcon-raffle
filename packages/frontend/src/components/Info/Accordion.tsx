@@ -1,7 +1,9 @@
+import { formatEther, parseEther } from '@ethersproject/units'
 import * as Accordion from '@radix-ui/react-accordion'
 import { ArrowDownIcon } from 'src/components/Icons'
 import { Rule, RuleText } from 'src/components/Info/Rules'
 import { useAuctionWinnersCount } from 'src/hooks/useAuctionWinnersCount'
+import { useMinimumBid } from 'src/hooks/useMinimumBid'
 import { useRaffleWinnersCount } from 'src/hooks/useRaffleWinnersCount'
 import { useVoucherRedeemDeadline } from 'src/hooks/useVoucherRedeemDeadline'
 import { Colors } from 'src/styles/colors'
@@ -13,7 +15,7 @@ export const InfoAccordion = () => {
   const raffleWinnersCount = useRaffleWinnersCount()
   const redeemTimestamp = useVoucherRedeemDeadline()
   const totalCount = auctionWinnersCount && raffleWinnersCount && auctionWinnersCount + raffleWinnersCount
-  const reservePrice = 0.25
+  const reservePrice = formatEther(useMinimumBid())
   const exampleBid = 0.5
 
   return (
@@ -83,7 +85,7 @@ export const InfoAccordion = () => {
               heading={`Raffle pool: ${raffleWinnersCount} tickets`}
               rule={`From participants who bid below the last bid in the auction pool, ${raffleWinnersCount} will be chosen at random. A winner in that pool will receive a ticket for ${reservePrice} ETH. All funds that they bid over that price will be claimable after the raffle is settled.`}
               example={`You bid ${exampleBid} ETH and end up below the top ${auctionWinnersCount}. If you are selected in the raffle, you pay ${reservePrice} ETH for the ticket and get ${(
-                exampleBid - reservePrice
+                exampleBid - parseEther(reservePrice).toNumber()
               ).toFixed(2)} ETH back.`}
             />
             <Rule

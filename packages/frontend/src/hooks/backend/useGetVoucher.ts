@@ -4,11 +4,11 @@ import { CONFIG } from 'src/config/config'
 
 export function useGetVoucher() {
   const { account } = useEthers()
-  return useCallback(async () => fetchVoucherCode(account ?? undefined), [account])
+  return useCallback(async () => fetchVoucherCode(), [account])
 }
 
-async function fetchVoucherCode(address?: string): Promise<{ voucherCode: string } | undefined> {
-  const response = await fetch(CONFIG.backendUrl + '/voucher-codes' + getAddressQuery(address), {
+async function fetchVoucherCode(): Promise<{ voucherCode: string } | undefined> {
+  const response = await fetch(CONFIG.backendUrl + '/voucher-codes', {
     method: 'GET',
     credentials: 'include',
   })
@@ -19,5 +19,3 @@ async function fetchVoucherCode(address?: string): Promise<{ voucherCode: string
     }
   }
 }
-
-const getAddressQuery = (address?: string) => (address ? `?userAddress=${address}` : '')

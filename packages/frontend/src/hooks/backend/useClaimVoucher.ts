@@ -1,8 +1,8 @@
 import { JsonRpcProvider } from '@ethersproject/providers'
-import { ChainId, useEthers } from '@usedapp/core'
+import { useEthers } from '@usedapp/core'
 import { useCallback } from 'react'
+import { SiweMessage } from 'siwe'
 import { CONFIG } from 'src/config/config'
-import { SupportedChainId } from 'src/constants/chainIDs'
 import { useAddresses } from 'src/hooks'
 import { useChainId } from 'src/hooks/chainId/useChainId'
 
@@ -13,50 +13,46 @@ export function useClaimVoucher() {
   return useCallback(
     async (nonce: string) => {
       if (library && account) {
-        const signature = await signClaimVoucher({ library: library as JsonRpcProvider, account, devcon, chainId, nonce })
-        if (!signature) {
-          return { error: 'Could not sign message.' }
+        // prepare login request to sign
+        const domain = window.location.host
+        const origin = window.location.origin
+        const message = new SiweMessage({
+          domain,
+          address: account,
+          statement: 'Sign in with Web3 wallet to the dApp',
+          uri: origin,
+          version: '1',
+          chainId,
+          nonce,
+        })
+        const signature = await (library as JsonRpcProvider).getSigner().signMessage(message.prepareMessage())
+
+        // verify login request
+        const response = await fetch(CONFIG.backendUrl + '/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message, signature }),
+          credentials: 'include'
+        })
+        if (response.status === 200) {
+          return { error: 'Could not verify address.' }
         }
-        return await fetchVoucherCode(account, nonce, signature)
+
+        return await fetchVoucherCode()
       }
     },
     [library, account, devcon, chainId]
   )
 }
 
-interface SignClaimVoucherArgs {
-  library: JsonRpcProvider
-  account: string
-  devcon: string
-  chainId: SupportedChainId
-  nonce: string
-}
-
-async function signClaimVoucher({
-  library,
-  account,
-  devcon,
-  chainId,
-  nonce,
-}: SignClaimVoucherArgs): Promise<string | undefined> {
-  const domain = getDomain(chainId)
-  const types = getTypes()
-  const data = getMessage(account, nonce, devcon)
-  try {
-    return await library.getSigner()._signTypedData(domain, types, data)
-  } catch (e) {
-    console.error(e)
-    return undefined
-  }
-}
-
-async function fetchVoucherCode(userAddress: string, nonce: string, signature: string): Promise<VoucherCodeResponse> {
+async function fetchVoucherCode(): Promise<VoucherCodeResponse> {
   const response = await fetch(CONFIG.backendUrl + '/voucher-codes', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ signature, nonce, userAddress }),
     credentials: 'include',
   })
   if ([200, 403].includes(response.status)) {
@@ -68,22 +64,3 @@ async function fetchVoucherCode(userAddress: string, nonce: string, signature: s
 }
 
 type VoucherCodeResponse = { voucherCode: string } | { error: string }
-
-const getDomain = (chainId: ChainId) => ({
-  name: 'Backend for AuctionRaffle contract',
-  chainId,
-})
-
-const getTypes = () => ({
-  Message: [
-    { name: 'contents', type: 'string' },
-    { name: 'contractAddress', type: 'string' },
-    { name: 'signatureNonce', type: 'string' },
-  ],
-})
-
-const getMessage = (signer: string, signatureNonce: string, contractAddress: string) => ({
-  contents: `Claim voucher code for address ${signer}.`,
-  contractAddress,
-  signatureNonce,
-})

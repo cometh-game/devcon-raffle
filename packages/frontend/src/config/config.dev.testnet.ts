@@ -16,7 +16,7 @@ export function getTestnetDevConfig(): Config {
       pollingInterval: POLLING_INTERVAL,
     },
     addresses: getAddresses(),
-    backendUrl: getStringEnv('VITE_BACKEND_URL') || 'http://localhost:3001',
+    backendUrl: getStringEnv('VITE_BACKEND_URL') || 'https://ethcc.develop.alembic.tech/api',
     portisDAppID: getStringEnv('VITE_PORTIS_DAPP_ID') || '',
     dappName: 'EthCC 6 Auction & Raffle (TESTNET DEV)',
     voucherRedeemDeadline: getDateEnv('VITE_VOUCHER_REDEEM_DEADLINE'),

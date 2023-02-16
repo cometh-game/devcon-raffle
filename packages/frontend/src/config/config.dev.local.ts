@@ -17,7 +17,7 @@ export function getLocalDevConfig(): Config {
       pollingInterval: POLLING_INTERVAL,
     },
     addresses: ADDRESSES,
-    backendUrl: 'http://localhost:3001',
+    backendUrl: 'http://localhost:3000',
     portisDAppID: getStringEnv('VITE_PORTIS_DAPP_ID') || '',
     dappName: 'EthCC 6 Auction & Raffle (LOCAL DEV)',
     voucherRedeemDeadline: getDateEnv('VITE_VOUCHER_REDEEM_DEADLINE'),

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon",
     "start": "yarn run build && node build/app.js",
-    "build": "tsc && tsc-alias",
+    "build": "tsc && tsc-alias && echo -- > /dev/null",
     "lint": "yarn lint:prettier --check && yarn lint:eslint",
     "lint:fix": "yarn lint:prettier --write --loglevel warn && yarn lint:eslint --fix",
     "lint:eslint": "eslint './{src,test}/**/*.{ts,tsx}' --cache",

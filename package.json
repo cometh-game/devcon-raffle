@@ -6,8 +6,7 @@
     "lint": "wsrun -c lint",
     "build": "wsrun -te -c build",
     "test": "wsrun -c test",
-    "verify": "wsrun -m -c verify",
-    "update": "git submodule update --remote"
+    "verify": "wsrun -m -c verify"
   },
   "workspaces": [
     "packages/contracts",

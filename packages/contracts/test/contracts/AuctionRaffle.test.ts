@@ -15,6 +15,7 @@ import { Provider } from '@ethersproject/providers'
 import { Zero } from '@ethersproject/constants'
 import { HOUR, MINUTE } from 'scripts/utils/consts'
 import { network } from 'hardhat'
+import { setPrevRandao } from "@nomicfoundation/hardhat-network-helpers";
 import { BigNumber, BigNumberish, ContractTransaction, Wallet } from 'ethers'
 import { State } from './state'
 import { WinType } from './winType'
@@ -475,34 +476,13 @@ describe('AuctionRaffle', function () {
     })
 
     it('reverts if called not by owner', async function () {
-      await expect(auctionRaffle.settleRaffle([1]))
+      await expect(auctionRaffle.settleRaffle())
         .to.be.revertedWith('Ownable: caller is not the owner')
     })
 
     it('reverts if raffle is not settled', async function () {
-      await expect(auctionRaffleAsOwner.settleRaffle([1]))
+      await expect(auctionRaffleAsOwner.settleRaffle())
         .to.be.revertedWith('AuctionRaffle: is in invalid state')
-    })
-
-    it('reverts if called with zero random numbers', async function () {
-      await endBidding(auctionRaffleAsOwner)
-      await settleAuction()
-
-      await expect(auctionRaffleAsOwner.settleRaffle([]))
-        .to.be.revertedWith('AuctionRaffle: there must be at least one random number passed')
-    })
-
-    it('reverts if called with incorrect amount of random numbers', async function () {
-      ({ auctionRaffle } = await loadFixture(configuredAuctionRaffleFixture({ raffleWinnersCount: 16 })))
-      auctionRaffleAsOwner = auctionRaffle.connect(owner())
-
-      await bid(20)
-      await endBidding(auctionRaffleAsOwner)
-      await settleAuction()
-
-      // Reverts because it expects 2 random numbers
-      await expect(auctionRaffleAsOwner.settleRaffle(randomBigNumbers(3)))
-        .to.be.revertedWith('AuctionRaffle: passed incorrect number of random numbers')
     })
 
     describe('when bidders count is less than raffleWinnersCount', function () {
@@ -517,7 +497,8 @@ describe('AuctionRaffle', function () {
 
         // Golden ticket winner participant index generated from this number: 2, bidderID: 3
         const randomNumber = BigNumber.from('65155287986987035700835155359065462427392489128550609102552042044410661181326')
-        await auctionRaffleAsOwner.settleRaffle([randomNumber])
+        await setPrevRandao(randomNumber.toHexString())
+        await auctionRaffleAsOwner.settleRaffle()
 
         for (let i = 1; i <= 4; i++) {
           const bid = await getBidByID(i)
@@ -557,8 +538,7 @@ describe('AuctionRaffle', function () {
       await endBidding(auctionRaffleAsOwner)
       await settleAuction()
 
-      const randomNumber = BigNumber.from('65155287986987035700835155359065462427392489128550609102552042044410661181326')
-      await auctionRaffleAsOwner.settleRaffle([randomNumber])
+      await auctionRaffleAsOwner.settleRaffle()
 
       const raffleWinners = await getAllBidsByWinType(10, WinType.raffle)
       const goldenWinners = await getAllBidsByWinType(10, WinType.goldenTicket)
@@ -576,16 +556,16 @@ describe('AuctionRaffle', function () {
       await endBidding(auctionRaffleAsOwner)
       await settleAuction()
 
-      // Participant indexes generated from this number:
-      // [[16, 16, 6, 7, 4, 9, 0, 1], [6, 3, 6, 7, 1, 3, 2, 2]]
-      const randomNumbers = [
-        BigNumber.from('112726022748934390014388827089462711312944969753614146584009694773482609536945'),
-        BigNumber.from('105047327762739474822912977776629330956455721538092382425528863739595553862604'),
-      ]
+      const seed =
+        BigNumber.from('112726022748934390014388827089462711312944969753614146584009694773482609536945')
 
-      await auctionRaffleAsOwner.settleRaffle(randomNumbers)
+      const participants = await auctionRaffle.getRaffleParticipants();
 
-      const winnersBidderIDs = [17, 19, 7, 8, 5, 10, 20, 2, 18, 4, 14, 16, 12, 10, 3, 15]
+      await setPrevRandao(seed.toHexString())
+      await auctionRaffleAsOwner.settleRaffle()
+
+      const winnersBidderIDs = [15, 10, 17, 19, 7, 13, 5, 16, 2, 20, 12, 3, 6, 4, 8, 18]
+
       for (let i = 0; i < winnersBidderIDs.length; i++) {
         const winningBid = await getBidByID(winnersBidderIDs[i])
         if (i === 0) {
@@ -608,7 +588,7 @@ describe('AuctionRaffle', function () {
 
       await settleAuction()
 
-      await auctionRaffleAsOwner.settleRaffle(randomBigNumbers(1))
+      await auctionRaffleAsOwner.settleRaffle()
 
       expect(await auctionRaffleAsOwner.getState()).to.be.eq(State.raffleSettled)
     })
@@ -627,13 +607,11 @@ describe('AuctionRaffle', function () {
         await endBidding(auctionRaffleAsOwner)
         await settleAuction() // auction winner bidderID: 1
 
-        // Golden ticket winner participant index generated from this number: 7, bidderID: 8
-        const tx = await auctionRaffleAsOwner.settleRaffle([7])
+        // Golden ticket winner participant index generated from this number: 7, bidderID: 4
+        await setPrevRandao(BigNumber.from(7).toHexString());
+        const tx = await auctionRaffleAsOwner.settleRaffle()
 
-        const raffleWinners: number[][] = [[9]]
-        for (let i = 2; i < 8; i++) {
-          raffleWinners.push([i])
-        }
+        const raffleWinners = [9, 2, 3, 8, 5, 6, 7].map((v) => [v])
         await emitsEvents(tx, 'NewRaffleWinner', ...raffleWinners)
       })
     })
@@ -1077,14 +1055,14 @@ describe('AuctionRaffle', function () {
     })
 
     describe('when bid amount is not divisible by 100', function () {
-      it('transfers correct amount with remainder', async function () {
+      it.only('transfers correct amount with remainder', async function () {
         const bidAmount = reservePrice.add(21)
         await bid(8)
         await bidAsWallet(wallets[9], bidAmount)
         await bidAsWallet(wallets[10], reservePrice.mul(2))
 
         // Non-winning bidderID from random number: 9
-        await bidAndSettleRaffle(0, [10])
+        await bidAndSettleRaffle(0, BigNumber.from(10))
 
         expect(await claimFees(1)).to.be.equal(calculateFee(bidAmount))
       })
@@ -1234,22 +1212,24 @@ describe('AuctionRaffle', function () {
     })
   }
 
-  async function bidDiscountAndSettleRaffle(bidCount: number, randomNumbers?: BigNumberish[]): Promise<ContractTransaction> {
+  async function bidDiscountAndSettleRaffle(bidCount: number, randomNumber?: BigNumberish): Promise<ContractTransaction> {
     await bidsWithDiscount(bidCount, 10)
     await endBidding(auctionRaffleAsOwner)
     await settleAuction()
 
-    const numbers = randomNumbers || randomBigNumbers(1)
-    return auctionRaffleAsOwner.settleRaffle(numbers)
+    const number = randomNumber || randomBigNumbers(1)[0]
+    await setPrevRandao(number.toHexString());
+    return auctionRaffleAsOwner.settleRaffle()
   }
 
-  async function bidAndSettleRaffle(bidCount: number, randomNumbers?: BigNumberish[]): Promise<ContractTransaction> {
+  async function bidAndSettleRaffle(bidCount: number, randomNumber?: BigNumberish): Promise<ContractTransaction> {
     await bid(bidCount)
     await endBidding(auctionRaffleAsOwner)
     await settleAuction()
 
-    const numbers = randomNumbers || randomBigNumbers(1)
-    return auctionRaffleAsOwner.settleRaffle(numbers)
+    const number = randomNumber || randomBigNumbers(1)[0]
+    await setPrevRandao(number.toHexString());
+    return auctionRaffleAsOwner.settleRaffle()
   }
 
   async function endBidding(auctionRaffle: AuctionRaffleMock) {

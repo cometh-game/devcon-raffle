@@ -1,7 +1,3 @@
-global-variables:
-  registry: &registry
-    from_secret: docker_registry
-
 kind: pipeline
 type: docker
 name: develop push
@@ -18,7 +14,8 @@ steps:
       image: plugins/gcr
       settings:
           dockerfile: Dockerfile
-          registry: *registry
+          registry:
+            from_secret: docker_registry
           repo: devcon-raffle
           tags:
               - develop
@@ -26,7 +23,7 @@ steps:
               from_secret: google_credentials
 
     - name: rolling update
-      image: *registry/app-rolling-update:latest
+      image: gcr.io/infra-342714/app-rolling-update:latest
       environment:
           GCP_SA:
               from_secret: google_credentials

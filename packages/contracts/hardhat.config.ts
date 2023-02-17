@@ -66,5 +66,8 @@ module.exports = {
   mocha: {
     ...mocharc,
     timeout: 400000
+  },
+  gasReporter: {
+    enabled: (process.env.REPORT_GAS) ? true : false
   }
 }

@@ -86,7 +86,7 @@ describe('AuctionRaffle - E2E', function () {
   })
 
   it('lets the owner settle the raffle', async function () {
-    await auctionRaffleAsOwner.settleRaffle(randomBigNumbers(10))
+    await auctionRaffleAsOwner.settleRaffle()
 
     expect(await auctionRaffle.getRaffleWinners()).to.have.lengthOf(80)
     expect(await auctionRaffle.getRaffleParticipants()).to.have.lengthOf(20)

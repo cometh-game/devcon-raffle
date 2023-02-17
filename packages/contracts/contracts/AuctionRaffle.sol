@@ -12,6 +12,8 @@ import "./models/BidModel.sol";
 import "./models/StateModel.sol";
 import "./libs/MaxHeap.sol";
 
+import "hardhat/console.sol";
+
 /***
  * @title Auction & Raffle
  * @notice Draws winners using a mixed auction & raffle scheme.
@@ -205,12 +207,8 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
      * becomes the Golden Ticket winner.
      * @dev Sets WinType of the first selected bid to GOLDEN_TICKET. Sets WinType to RAFFLE for the remaining selected
      * bids.
-     * @param randomNumbers The source of randomness for the function. Each random number is used to draw at most
-     * `_winnersPerRandom` raffle winners.
      */
-    function settleRaffle(uint256[] memory randomNumbers) external onlyOwner onlyInState(State.AUCTION_SETTLED) {
-        require(randomNumbers.length > 0, "AuctionRaffle: there must be at least one random number passed");
-
+    function settleRaffle() external onlyOwner onlyInState(State.AUCTION_SETTLED) {
         _settleState = SettleState.RAFFLE_SETTLED;
 
         uint256 participantsLength = _raffleParticipants.length;
@@ -218,18 +216,22 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
             return;
         }
 
+        uint256 seed = block.difficulty;
+        uint256 raffleWinnersCount = _raffleWinnersCount;
+        uint256[] memory randomNumbers = new uint256[](raffleWinnersCount / _winnersPerRandom);
+        {
+          uint256 randomNumbersLen = randomNumbers.length;
+          for (uint256 i = 0; i < randomNumbersLen; ++i) {
+            randomNumbers[i] = uint256(keccak256(abi.encode(seed, i)));
+          }
+        }
+
         (participantsLength, randomNumbers[0]) = selectGoldenTicketWinner(participantsLength, randomNumbers[0]);
 
-        uint256 raffleWinnersCount = _raffleWinnersCount;
         if (participantsLength < raffleWinnersCount) {
             selectAllRaffleParticipantsAsWinners(participantsLength);
             return;
         }
-
-        require(
-            randomNumbers.length == raffleWinnersCount / _winnersPerRandom,
-            "AuctionRaffle: passed incorrect number of random numbers"
-        );
 
         selectRaffleWinners(participantsLength, randomNumbers);
     }

@@ -1055,14 +1055,14 @@ describe('AuctionRaffle', function () {
     })
 
     describe('when bid amount is not divisible by 100', function () {
-      it.only('transfers correct amount with remainder', async function () {
+      it('transfers correct amount with remainder', async function () {
         const bidAmount = reservePrice.add(21)
         await bid(8)
         await bidAsWallet(wallets[9], bidAmount)
         await bidAsWallet(wallets[10], reservePrice.mul(2))
 
         // Non-winning bidderID from random number: 9
-        await bidAndSettleRaffle(0, BigNumber.from(10))
+        await bidAndSettleRaffle(0, BigNumber.from(2))
 
         expect(await claimFees(1)).to.be.equal(calculateFee(bidAmount))
       })

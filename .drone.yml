@@ -14,8 +14,7 @@ steps:
       image: plugins/gcr
       settings:
           dockerfile: Dockerfile
-          registry:
-            from_secret: docker_registry
+          registry: gcr.io/infra-342714
           repo: devcon-raffle
           tags:
               - develop

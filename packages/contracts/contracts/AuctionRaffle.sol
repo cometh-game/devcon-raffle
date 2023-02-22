@@ -5,11 +5,14 @@ pragma solidity 0.8.10;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 import "./Config.sol";
 import "./models/BidModel.sol";
 import "./models/StateModel.sol";
 import "./libs/MaxHeap.sol";
+
+import "hardhat/console.sol";
 
 /***
  * @title Auction & Raffle
@@ -69,7 +72,8 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
         uint256 auctionWinnersCount,
         uint256 raffleWinnersCount,
         uint256 reservePrice,
-        uint256 minBidIncrement
+        uint256 minBidIncrement,
+        bytes32 discountRoot
     )
         Config(
             biddingStartTime,
@@ -78,7 +82,8 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
             auctionWinnersCount,
             raffleWinnersCount,
             reservePrice,
-            minBidIncrement
+            minBidIncrement,
+            discountRoot
         )
         Ownable()
     {
@@ -100,6 +105,46 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
      * @dev Assigns a unique bidderID to the sender address.
      */
     function bid() external payable onlyExternalTransactions onlyInState(State.BIDDING_OPEN) {
+      makeBid();
+    }
+
+    /***
+     * @notice Places a new bid or bumps an existing bid with a discount.
+     * The discount is proved using a Merkle Proof.
+     * @dev Applies a discount on the msg.sender's bid. We need to store each bidder's discount
+     * so that we can easily compute claimable proceeds when settlement is done.
+     * If msg.sender makes multiple bids, the highest discount is kept.
+     */
+    function bidWithDiscount(
+      uint256 discountPercentage,
+      bytes32[] memory proof
+    ) external payable onlyExternalTransactions onlyInState(State.BIDDING_OPEN) {
+      require(discountPercentage <= 100, "AuctionRaffle: discount must be at most 100%");
+
+      bytes32 leaf = keccak256(abi.encode(msg.sender, discountPercentage));
+      require(
+        MerkleProof.verify(proof, discountRoot, leaf),
+        "AuctionRaffle: discount proof invalid"
+      );
+      makeBid();
+
+      // after making a bid, bidder exists for `msg.sender`
+      Bid storage bidder = _bids[msg.sender];
+      uint256 oldDiscount = bidder.discount;
+
+      uint256 reservePrice = _reservePrice;
+      uint256 discount = (reservePrice * discountPercentage) / 100;
+
+      if (discount > oldDiscount) {
+        bidder.discount = discount;
+      }
+    }
+
+    /***
+     * @notice Places a new bid or bumps an existing bid.
+     * @dev Assigns a unique bidderID to the sender address.
+     */
+    function makeBid() private {
         Bid storage bidder = _bids[msg.sender];
         if (bidder.amount == 0) {
             require(msg.value >= _reservePrice, "AuctionRaffle: bid amount is below reserve price");
@@ -162,12 +207,8 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
      * becomes the Golden Ticket winner.
      * @dev Sets WinType of the first selected bid to GOLDEN_TICKET. Sets WinType to RAFFLE for the remaining selected
      * bids.
-     * @param randomNumbers The source of randomness for the function. Each random number is used to draw at most
-     * `_winnersPerRandom` raffle winners.
      */
-    function settleRaffle(uint256[] memory randomNumbers) external onlyOwner onlyInState(State.AUCTION_SETTLED) {
-        require(randomNumbers.length > 0, "AuctionRaffle: there must be at least one random number passed");
-
+    function settleRaffle() external onlyOwner onlyInState(State.AUCTION_SETTLED) {
         _settleState = SettleState.RAFFLE_SETTLED;
 
         uint256 participantsLength = _raffleParticipants.length;
@@ -175,18 +216,22 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
             return;
         }
 
+        uint256 seed = block.difficulty;
+        uint256 raffleWinnersCount = _raffleWinnersCount;
+        uint256[] memory randomNumbers = new uint256[](raffleWinnersCount / _winnersPerRandom);
+        {
+          uint256 randomNumbersLen = randomNumbers.length;
+          for (uint256 i = 0; i < randomNumbersLen; ++i) {
+            randomNumbers[i] = uint256(keccak256(abi.encode(seed, i)));
+          }
+        }
+
         (participantsLength, randomNumbers[0]) = selectGoldenTicketWinner(participantsLength, randomNumbers[0]);
 
-        uint256 raffleWinnersCount = _raffleWinnersCount;
         if (participantsLength < raffleWinnersCount) {
             selectAllRaffleParticipantsAsWinners(participantsLength);
             return;
         }
-
-        require(
-            randomNumbers.length == raffleWinnersCount / _winnersPerRandom,
-            "AuctionRaffle: passed incorrect number of random numbers"
-        );
 
         selectRaffleWinners(participantsLength, randomNumbers);
     }
@@ -207,7 +252,9 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
         bidder.claimed = true;
         uint256 claimAmount;
         if (bidder.winType == WinType.RAFFLE) {
-            claimAmount = bidder.amount - _reservePrice;
+            // discount = 0 if no discount to apply
+            // discount = a % of _reservePrice so subtracting is safe
+            claimAmount = bidder.amount - (_reservePrice - bidder.discount);
         } else if (bidder.winType == WinType.GOLDEN_TICKET) {
             claimAmount = bidder.amount;
         } else if (bidder.winType == WinType.LOSS) {
@@ -242,12 +289,21 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
             totalAmount += _bids[bidderAddress].amount;
         }
 
+        // becausse there could be discounts applied on raffle winners, we need to subtract discounts
         uint256 raffleWinnersCount = _raffleWinnersCount - 1;
         if (biddersCount <= raffleWinnersCount) {
             raffleWinnersCount = biddersCount - 1;
         }
+
         totalAmount += raffleWinnersCount * _reservePrice;
 
+        uint256 discounts = 0;
+        for (uint256 i = 0; i < raffleWinnersCount; ++i) {
+            address bidderAddress = _bidders[_raffleWinners[i]];
+            discounts += _bids[bidderAddress].discount;
+        }
+
+        totalAmount -= discounts;
         payable(owner()).transfer(totalAmount);
     }
 

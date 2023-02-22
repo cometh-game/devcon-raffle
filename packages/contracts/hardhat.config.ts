@@ -1,6 +1,6 @@
-import '@nomicfoundation/hardhat-toolbox'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-ethers'
+import '@nomiclabs/hardhat-waffle'
 import './abi-exporter'
 import 'tsconfig-paths/register'
 import 'hardhat-gas-reporter'
@@ -66,5 +66,8 @@ module.exports = {
   mocha: {
     ...mocharc,
     timeout: 400000
+  },
+  gasReporter: {
+    enabled: (process.env.REPORT_GAS) ? true : false
   }
 }

@@ -1,7 +1,9 @@
 import { AuctionRaffleMock__factory, ExampleToken__factory } from 'contracts'
-import { BigNumberish, utils, Wallet } from 'ethers'
+import { BigNumberish, utils, constants, Wallet, BytesLike } from 'ethers'
 import { MockProvider } from 'ethereum-waffle'
+import { MerkleTree } from 'merkletreejs'
 import { getLatestBlockTimestamp } from 'utils/getLatestBlockTimestamp'
+import { merkleTreeFixture } from 'fixtures/merkleTreeFixture'
 import { WEEK } from 'scripts/utils/consts'
 
 export const auctionWinnersCount = 1
@@ -18,6 +20,7 @@ export type auctionRaffleParams = {
   raffleWinnersCount?: number,
   reservePrice?: BigNumberish,
   minBidIncrement?: BigNumberish,
+  discountTree?: MerkleTree,
 }
 
 export function auctionRaffleFixture(wallets: Wallet[], provider: MockProvider) {
@@ -39,8 +42,10 @@ export async function auctionRaffleE2EFixture(wallets: Wallet[], provider: MockP
   })(wallets, provider)
 }
 
-export function configuredAuctionRaffleFixture(params: auctionRaffleParams) {
-  return async ([deployer, owner]: Wallet[], provider: MockProvider) => {
+export function configuredAuctionRaffleFixture(params: auctionRaffleParams, discounts = [10, 20]) {
+  return async (wallets: Wallet[], provider: MockProvider) => {
+    const [deployer, owner] = wallets
+    const discountTree = params.discountTree || merkleTreeFixture(wallets, discounts)
     const currentBlockTimestamp = await getLatestBlockTimestamp(provider)
     params = setAuctionRaffleParamsDefaults(owner, currentBlockTimestamp, params)
 
@@ -53,9 +58,10 @@ export function configuredAuctionRaffleFixture(params: auctionRaffleParams) {
       params.raffleWinnersCount,
       params.reservePrice,
       params.minBidIncrement,
+      '0x' + (discountTree).getRoot().toString('hex')
     )
 
-    return { provider, auctionRaffle }
+    return { provider, auctionRaffle, discountTree, discounts }
   }
 }
 
@@ -73,5 +79,6 @@ function defaultAuctionRaffleParams(owner: Wallet, biddingStartTime: number): au
     raffleWinnersCount: raffleWinnersCount,
     reservePrice: reservePrice,
     minBidIncrement: minBidIncrement,
+    discountTree: null,
   }
 }

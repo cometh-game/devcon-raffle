@@ -34,7 +34,7 @@ export function useClaimVoucher() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ message, signature }),
-          credentials: 'include'
+          credentials: 'include',
         })
         if (response.status === 200) {
           return { error: 'Could not verify address.' }

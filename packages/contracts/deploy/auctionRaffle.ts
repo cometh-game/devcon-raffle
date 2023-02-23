@@ -1,6 +1,7 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types"
 import { DeployFunction } from "hardhat-deploy/types"
 import { config } from '../scripts/deploymentConfig'
+import { ethers } from "ethers"
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 	const {
@@ -19,6 +20,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       config.raffleWinnersCount,
       config.reservePrice,
       config.minBidIncrement,
+      ethers.utils.defaultAbiCoder.encode(['uint256'], ['0x0'])
     ],
 		log: true,
 	})

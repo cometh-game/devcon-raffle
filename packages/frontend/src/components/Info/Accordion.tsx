@@ -1,4 +1,4 @@
-import { formatEther, parseEther } from '@ethersproject/units'
+import { formatEther } from '@ethersproject/units'
 import * as Accordion from '@radix-ui/react-accordion'
 import { ArrowDownIcon } from 'src/components/Icons'
 import { Rule, RuleText } from 'src/components/Info/Rules'
@@ -11,8 +11,8 @@ import { formatEndDate } from 'src/utils/formatters'
 import styled from 'styled-components'
 
 export const InfoAccordion = () => {
-  const auctionWinnersCount = useAuctionWinnersCount()
-  const raffleWinnersCount = useRaffleWinnersCount()
+  const auctionWinnersCount = useAuctionWinnersCount() || 0
+  const raffleWinnersCount = useRaffleWinnersCount() || 0
   const redeemTimestamp = useVoucherRedeemDeadline()
   const totalCount = auctionWinnersCount && raffleWinnersCount && auctionWinnersCount + raffleWinnersCount
   const reservePrice = formatEther(useMinimumBid())
@@ -45,11 +45,12 @@ export const InfoAccordion = () => {
           </StyledHeader>
           <StyledContent>
             Join the contest by submitting a bid for the ticket based on the amount you would value having a EthCC
-            ticket. Bid high to compete for the 20 tickets distributed in the auction, or be entered into the raffle for
-            a chance to buy a ticket at the reserve price. You need to bid at least the reserve price, which is set to
-            the price of a standard EthCC ticket at time of publication: <Bold>{reservePrice} ETH.</Bold> Please note
-            there is a one-person-one-bid rule in place. You will need to submit your name at check-out, and we will
-            check IDs at EthCC to verify that the participant is the ticket holder.
+            ticket. Bid high to compete for the {auctionWinnersCount} tickets distributed in the auction, or be entered
+            into the raffle for a chance to buy a ticket at the reserve price. You need to bid at least the reserve
+            price, which is set to the price of a standard EthCC ticket at time of publication:{' '}
+            <Bold>{reservePrice} ETH.</Bold> Please note there is a one-person-one-bid rule in place. You will need to
+            submit your name at check-out, and we will check IDs at EthCC to verify that the participant is the ticket
+            holder.
           </StyledContent>
         </Accordion.Item>
 
@@ -100,32 +101,34 @@ export const InfoAccordion = () => {
               } ETH back.`}
             />
             <Rule
-              heading="What if there’s less than 100 participants?"
+              heading={`What if there’s less than ${auctionWinnersCount + raffleWinnersCount} participants?`}
               rule={
                 <>
                   In the event there are:
                   <BulletList>
                     <li>
                       <ListText>
-                        <Bold>1-80 participants:</Bold> All bidders win in the raffle.
+                        <Bold>1-{raffleWinnersCount} participants:</Bold> All bidders win in the raffle.
                       </ListText>
                     </li>
                     <li>
                       <ListText>
-                        <Bold>81 participants:</Bold> Top 1 bidder wins in the auction. 80 remaining bidders win in the
-                        raffle.
+                        <Bold>81 participants:</Bold> Top 1 bidder wins in the auction. {raffleWinnersCount} remaining
+                        bidders win in the raffle.
                       </ListText>
                     </li>
                     <li>
                       <ListText>
-                        <Bold>101 participants:</Bold> Top 20 bidders win in the auction. Out of 81 remaining bidders,
-                        80 are randomly chosen to win in the raffle.
+                        <Bold>{auctionWinnersCount + raffleWinnersCount + 1} participants:</Bold> Top{' '}
+                        {auctionWinnersCount} bidders win in the auction. Out of {raffleWinnersCount + 1} remaining
+                        bidders, {raffleWinnersCount} are randomly chosen to win in the raffle.
                       </ListText>
                     </li>
                     <li>
                       <ListText>
-                        <Bold>120 participants:</Bold> Top 20 bidders win in the auction. Out of 100 remaining bidders,
-                        80 are randomly chosen to win in the raffle.
+                        <Bold>{auctionWinnersCount + raffleWinnersCount + 20} participants:</Bold> Top{' '}
+                        {auctionWinnersCount} bidders win in the auction. Out of {raffleWinnersCount + 20} remaining
+                        bidders, {raffleWinnersCount} are randomly chosen to win in the raffle.
                       </ListText>
                     </li>
                   </BulletList>

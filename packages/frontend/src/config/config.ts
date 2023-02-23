@@ -32,6 +32,7 @@ function getConfig(mode: string): Config {
 function getDevConfig(network: string | undefined): Config {
   switch (network) {
     case 'ArbitrumRinkeby':
+    case 'Goerli':
     case 'Mumbai':
       return getTestnetDevConfig()
     default:
@@ -42,6 +43,7 @@ function getDevConfig(network: string | undefined): Config {
 function getProdConfig(network: string | undefined): Config {
   switch (network) {
     case 'ArbitrumRinkeby':
+    case 'Goerli':
     case 'Mumbai':
       return getTestnetProdConfig()
     default:

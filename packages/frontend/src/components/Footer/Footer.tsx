@@ -1,4 +1,4 @@
-import { TruefiLogoIcon, ComethLogoIcon } from 'src/components/Icons'
+import { TruefiLogoIcon } from 'src/components/Icons'
 import { Colors, hexOpacity } from 'src/styles/colors'
 import styled from 'styled-components'
 

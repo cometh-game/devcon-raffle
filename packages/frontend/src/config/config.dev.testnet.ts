@@ -1,4 +1,4 @@
-import { Mumbai } from '@usedapp/core'
+import { Goerli } from '@usedapp/core'
 import { providerWithInterval } from 'src/constants/nodeUrls'
 import { POLLING_INTERVAL } from 'src/constants/pollingInterval'
 
@@ -10,9 +10,9 @@ export function getTestnetDevConfig(): Config {
   return {
     useDAppConfig: {
       ...commonUseDAppConfig,
-      readOnlyChainId: Mumbai.chainId,
-      readOnlyUrls: providerWithInterval(Mumbai.chainId, POLLING_INTERVAL),
-      networks: [Mumbai],
+      readOnlyChainId: Goerli.chainId,
+      readOnlyUrls: providerWithInterval(Goerli.chainId, POLLING_INTERVAL),
+      networks: [Goerli],
       pollingInterval: POLLING_INTERVAL,
     },
     addresses: getAddresses(),

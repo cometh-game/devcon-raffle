@@ -1,6 +1,5 @@
 import { BackButton } from 'src/components/Buttons'
 import { HeaderBar } from 'src/components/common/Header'
-import { KeyIcon } from 'src/components/Icons'
 import { useAuctionWinnersCount, useBids, useRaffleWinnersCount } from 'src/hooks'
 import { Colors } from 'src/styles/colors'
 import styled from 'styled-components'
@@ -17,12 +16,9 @@ export const Header = () => {
       <Wrapper>
         <Title>
           <h2>Number of participants:</h2>
-          <Number>{isLoadingParams ? 0 : bids.size}</Number>
+          <h2>{isLoadingParams ? 0 : bids.size}</h2>
         </Title>
       </Wrapper>
-      <Key>
-        <KeyIcon />
-      </Key>
     </StyledHeader>
   )
 }
@@ -31,6 +27,11 @@ const StyledHeader = styled(HeaderBar)`
   height: 160px;
   padding: 28px 68px;
   overflow: hidden;
+  display: flex;
+  flex-shrink: 0;
+  width: 100%;
+  position: relative;
+  background: linear-gradient(to left, #2800A5 0%, #4B00FF 16.66%, #6400FF 33.33%, #8C00F0 50%, #DF00A6 66%, #FF005F 83.33%, #FF0000 100%);
 `
 
 const Wrapper = styled.div`

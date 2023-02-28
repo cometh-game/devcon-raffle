@@ -42,7 +42,7 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   h1, h2, h3, h4 {
-    font-family: 'Space Mono', 'Roboto Mono', monospace;
+    font-family: 'Jetbrains Mono', 'Space Mono', monospace;
     font-style: normal;
     margin: 0;
   }

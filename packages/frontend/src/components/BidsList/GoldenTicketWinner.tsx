@@ -29,7 +29,7 @@ const Container = styled.div`
   align-items: center;
   width: 100%;
   height: 90px;
-  background-color: ${Colors.GreenLight};
+  background-color: #4B00FF;
 `
 
 const Section = styled.div`
@@ -54,11 +54,12 @@ const ReverseDoot = styled(Doot)`
 const HeaderText = styled.h3`
   font-size: 20px;
   line-height: 150%;
+  color: ${Colors.White};
 `
 
 const AddressLink = styled.a`
-  font-family: 'Space Mono', 'Roboto Mono', monospace;
+  font-family: 'Jetbrains Mono', 'Space Mono', 'Roboto Mono', monospace;
   font-style: normal;
-  color: ${Colors.Blue};
+  color: ${Colors.White};
   text-decoration: none;
 `

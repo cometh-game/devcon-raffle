@@ -3756,10 +3756,10 @@
   resolved "https://registry.yarnpkg.com/@uniswap/token-lists/-/token-lists-1.0.0-beta.31.tgz#ff3852bd505ec7b4c276625c762ea79a93a919ec"
   integrity sha512-BQVoelKCRf64IToPEs1wxiXOnhr/ukwPOF78XG11PrTAOL4F8umjYKFb8ZPv1/dIJsPaC7GhLSriEqyp94SasQ==
 
-"@usedapp/core@^1.2.2":
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/@usedapp/core/-/core-1.2.5.tgz#7e477c51c03e7690ef55973c629837a205d07410"
-  integrity sha512-KYu8bZ4JoDSsZN3E/coRIaIQv0+wjadDRk0K2WzXdNYWQ/eHJjhBkMRxEDqFryEN1Zv2I4WV7yD5nvxlOfy/cg==
+"@usedapp/core@^1.2.7":
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/@usedapp/core/-/core-1.2.7.tgz#c1560ce2577a518de6ed367f7cddbe48e6d17127"
+  integrity sha512-izqa9eXmMeqLq9vg1bX4xU8LOFDIlyfwQnHNuaYM1QuJ2IU3cRSBjXbcahzGZS+aUgW2ue3/wNmOZf20OWZhYA==
   dependencies:
     "@metamask/detect-provider" "^2.0.0"
     "@uniswap/token-lists" "^1.0.0-beta.27"
@@ -3935,7 +3935,7 @@
     js-sha3 "0.8.0"
     query-string "6.13.5"
 
-"@walletconnect/web3-provider@^1.7.8":
+"@walletconnect/web3-provider@^1.8.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@walletconnect/web3-provider/-/web3-provider-1.8.0.tgz#e90d903f4c609b7158ecb5f0f41df121e93b56b5"
   integrity sha512-lqqEO0oRmCehH+c8ZPk3iH7I7YtbzmkWd58/Or2AgWAl869JamzndKCD3sTlNsPRQLxxPpraHQqzur7uclLWvg==
@@ -15960,7 +15960,7 @@ web3@1.2.11:
     web3-shh "1.2.11"
     web3-utils "1.2.11"
 
-web3modal@^1.9.7:
+web3modal@^1.9.12:
   version "1.9.12"
   resolved "https://registry.yarnpkg.com/web3modal/-/web3modal-1.9.12.tgz#cb000888fa422a96e3df552d4784e347ba35efcc"
   integrity sha512-RiLY2tNOEUCobtsMTmhwl/FoHZGxRZz7SSdLsh6qbbybPNUO0rFPY8xam9SpPwlLd2cUDGiWkLgDUJde0sHxdw==

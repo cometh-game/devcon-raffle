@@ -18,7 +18,8 @@ export function useInjectedProviderChainId(): SupportedChainId | undefined {
   }
 
   if (!isSupportedChainId(chainId)) {
-    throw new Error('chainId returned by useEthers is not one of SupportedChainIds')
+    //throw new Error('chainId returned by useEthers is not one of SupportedChainIds')
+    return undefined
   }
 
   return chainId

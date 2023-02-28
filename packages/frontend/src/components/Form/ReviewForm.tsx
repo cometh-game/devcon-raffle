@@ -6,8 +6,10 @@ import { heading } from 'src/components/Auction/AuctionTransaction'
 import { Button } from 'src/components/Buttons'
 import { FormRow, FormNarrow } from 'src/components/Form/Form'
 import { TransactionAction, Transactions } from 'src/components/Transaction'
+import { useEligibleDiscount } from 'src/hooks/useEligibleDiscount'
 import { formatEtherAmount } from 'src/utils/formatters'
 import { isTxPending } from 'src/utils/transactions/isTxPending'
+import styled from 'styled-components'
 
 const amountLabel = {
   [Transactions.Place]: 'Your Bid',
@@ -37,6 +39,7 @@ export const ReviewForm = ({
   const { account } = useEthers()
   const etherBalance = useEtherBalance(account)
   const isPending = isTxPending(action.state)
+  const discount = useEligibleDiscount()
 
   useEffect(() => {
     if (action.state.status === 'Success') {
@@ -57,6 +60,10 @@ export const ReviewForm = ({
   return (
     <FormNarrow>
       <FormRow>
+        <span>Wallet Balance</span>
+        <span>{etherBalance && formatEtherAmount(etherBalance)} ETH</span>
+      </FormRow>
+      <FormRow>
         <span>{amountLabel[action.type]}</span>
         <span>{formatEtherAmount(amount)} ETH</span>
       </FormRow>
@@ -66,13 +73,20 @@ export const ReviewForm = ({
           <span>{formatEtherAmount(impact)} ETH</span>
         </FormRow>
       )}
-      <FormRow>
-        <span>Wallet Balance</span>
-        <span>{etherBalance && formatEtherAmount(etherBalance)} ETH</span>
-      </FormRow>
       <Button view="primary" isLoading={isPending} onClick={sendTransaction}>
         {heading[action.type]}
       </Button>
+      {discount > 0 && (
+        <FormRow>
+          <Discount>
+            You are eligible to a discount. A {discount}% discount will be applied at the end of the raffle.
+          </Discount>
+        </FormRow>
+      )}
     </FormNarrow>
   )
 }
+
+const Discount = styled.span`
+  opacity: 0.7;
+`

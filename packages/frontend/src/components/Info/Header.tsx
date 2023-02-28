@@ -1,12 +1,12 @@
-import { KeyIcon } from 'src/components/Icons'
 import { AuctionState, useAuctionState } from 'src/hooks'
 import { Colors } from 'src/styles/colors'
 import styled from 'styled-components'
 
+import background from '../../assets/ethcc-background.svg'
+
 import { HeaderBar } from '../common/Header'
 
-import { TimeLeft } from './TimeLeft'
-import { VoucherTimeLeft } from './VoucherTimeLeft'
+import { ClaimTicketTimeLeft } from './ClaimTicketTimeLeft'
 
 export const Header = () => {
   const state = useAuctionState()
@@ -17,17 +17,13 @@ export const Header = () => {
         <HeaderWrapper>
           <InfoWrapper>
             <TitleWrapper>
-              <Title>EthCC 6</Title>
+              <Title>EthCC[6]</Title>
               <SubTitle>Auction & Raffle Ticket Sale</SubTitle>
             </TitleWrapper>
-            <TimeLeft />
           </InfoWrapper>
-          <Key>
-            <KeyIcon />
-          </Key>
         </HeaderWrapper>
       </StyledHeader>
-      {isClaimingFlow(state) && <VoucherTimeLeft />}
+      {isClaimingFlow(state) && <ClaimTicketTimeLeft />}
     </Wrapper>
   )
 }
@@ -44,6 +40,9 @@ const Wrapper = styled.div`
 const StyledHeader = styled(HeaderBar)`
   height: 225px;
   padding: 16px 125px 24px 68px;
+
+  #background-image: url(${background});
+  #background-size: cover;
 `
 
 const HeaderWrapper = styled.div`
@@ -82,6 +81,7 @@ const TitleWrapper = styled.div`
 `
 
 const Title = styled.h1`
+  color: ${Colors.Black};
   @media screen and (min-width: 1800px) {
     line-height: 1;
   }
@@ -92,20 +92,5 @@ const Title = styled.h1`
 `
 
 const SubTitle = styled.h3`
-  color: ${Colors.White};
-`
-const Key = styled.div`
-  position: absolute;
-  top: -16px;
-  right: 0;
-  height: 225px;
-  opacity: 0.5;
-
-  @media screen and (max-width: 1240px) {
-    opacity: 0.2;
-  }
-
-  @media screen and (min-width: 1400px) {
-    opacity: 1;
-  }
+  color: ${Colors.Black};
 `

@@ -16,7 +16,7 @@ export const web3Modal = `
     }
 
     .web3modal-provider-name{
-      font-family: 'Space Mono', 'Roboto Mono', monospace;
+      font-family: 'Jetbrains Mono', 'Space Mono', 'Roboto Mono', monospace;
       padding-bottom: 10px;
     }
   }

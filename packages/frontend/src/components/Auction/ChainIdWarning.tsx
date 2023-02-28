@@ -19,7 +19,7 @@ export const ChainIdWarning = () => {
       </FormRow>
       <FormRow>
         <span>
-          To {text.action} connect your wallet to the <b>Arbitrum network.</b>
+          To {text.action} connect your wallet to the <b>Ethereum network.</b>
         </span>
       </FormRow>
       <FormRow>

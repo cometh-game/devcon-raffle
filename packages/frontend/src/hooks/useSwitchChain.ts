@@ -18,14 +18,14 @@ interface SwitchEthereumChainParameter {
 }
 
 const toHex = (value: number) => unpadHexString(BigNumber.from(value).toHexString())
-const arbitrumChainId = toHex(ChainId.Arbitrum)
+const goerliChainId = toHex(ChainId.Goerli)
 const errChainNotAddedYet = 4902
 
-const addArbitrumChain: AddEthereumChainParameter = {
-  chainId: arbitrumChainId,
-  chainName: 'Arbitrum One',
-  rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-  blockExplorerUrls: ['https://arbiscan.io'],
+const addGoerliChain: AddEthereumChainParameter = {
+  chainId: goerliChainId,
+  chainName: 'Goerli',
+  rpcUrls: ['https://goerli.blockpi.network/v1/rpc/public'],
+  blockExplorerUrls: ['https://goerli.etherscan.io'],
 }
 const getSwitchChainParam = (chainId: SupportedChainId): SwitchEthereumChainParameter => ({ chainId: toHex(chainId) })
 
@@ -48,11 +48,12 @@ async function switchOrAddChain(library: JsonRpcProvider, chainId: SupportedChai
       await addChain(library)
     }
   }
+  window.location.reload() // HACK: the app kinda crashes when a network change occurs :(
 }
 
 async function addChain(library: JsonRpcProvider) {
   try {
-    await library.send('wallet_addEthereumChain', [addArbitrumChain])
+    await library.send('wallet_addEthereumChain', [addGoerliChain])
   } catch (error: any) {
     return // error already logged by MetaMask
   }

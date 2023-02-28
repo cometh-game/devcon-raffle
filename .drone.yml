@@ -8,7 +8,7 @@ steps:
           - yarn install
           - yarn build --mode development
       environment:
-          VITE_NETWORK: 'Mumbai'
+          VITE_NETWORK: 'Goerli'
 
     - name: build and push
       image: plugins/gcr
@@ -48,7 +48,7 @@ steps:
       when:
           status: [success, failure]
 trigger:
-    branch: 
+    branch:
         - develop
     event:
         - push

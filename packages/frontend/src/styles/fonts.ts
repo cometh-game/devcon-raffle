@@ -8,6 +8,9 @@ import SpaceMonoBoldWoff from './fonts/SpaceMono/SpaceMono-Bold.woff'
 import SpaceMonoBoldWoff2 from './fonts/SpaceMono/SpaceMono-Bold.woff2'
 import SpaceMonoRegularWoff from './fonts/SpaceMono/SpaceMono-Regular.woff'
 import SpaceMonoRegularWoff2 from './fonts/SpaceMono/SpaceMono-Regular.woff2'
+import JetbrainsMonoRegular from './fonts/JetBrainsMono/JetBrainsMono-Regular.woff2'
+import JetbrainsMonoBold from './fonts/JetBrainsMono/JetBrainsMono-Bold.woff2'
+
 
 export const fonts = `
   /* Roboto Font Family */
@@ -19,7 +22,7 @@ export const fonts = `
     font-style: normal;
     font-weight: 400;
   }
-  
+
   @font-face {
     font-family: 'Roboto';
     src: url(${RobotoMediumWoff2}) format('woff2'),
@@ -27,7 +30,7 @@ export const fonts = `
     font-style: normal;
     font-weight: 500;
   }
-  
+
   @font-face {
     font-family: 'Roboto';
     src: url(${RobotoBoldWoff}) format('woff2'),
@@ -51,6 +54,22 @@ export const fonts = `
     src: url(${SpaceMonoBoldWoff}) format('woff2'),
         url(${SpaceMonoBoldWoff2}) format('woff');
     font-style: normal;
+    font-weight: 700;
+  }
+
+  /* Jetbrains Mono Font Family */
+
+  @font-face {
+    font-family: 'Jetbrains Mono';
+    src: url(${JetbrainsMonoRegular}) format('woff2');
+    font-style: normal:
+    font-weight: 400;
+  }
+
+  @font-face {
+    font-family: 'Jetbrains Mono';
+    src: url(${JetbrainsMonoBold}) format('woff2');
+    font-style: normal:
     font-weight: 700;
   }
 `

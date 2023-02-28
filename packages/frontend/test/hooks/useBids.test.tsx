@@ -1,4 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
+import { Zero } from '@ethersproject/constants'
 import { parseEther } from '@ethersproject/units'
 import { renderHook, WrapperComponent } from '@testing-library/react-hooks'
 import { useBids } from 'src/hooks/useBids'
@@ -142,6 +143,7 @@ describe('useBids', () => {
     return {
       bidderID: BigNumber.from(bidderID),
       amount: parseEther(amount),
+      discount: Zero,
       bidderAddress: mockBidsAddresses[bidderID - 1],
       place: -1,
     }

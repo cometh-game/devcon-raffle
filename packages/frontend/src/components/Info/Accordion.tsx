@@ -91,7 +91,7 @@ export const InfoAccordion = () => {
             />
             <Rule
               heading="Golden Ticket: 1 ticket"
-              rule="One lucky bidder from the raffle pool will receive a ticket for EthCC 6 totally for free! The Golden Ticket winner will be able to claim the whole amount of their bid after the raffle is settled."
+              rule="One lucky bidder from the raffle pool will receive a ticket for EthCC[6] totally for free! The Golden Ticket winner will be able to claim the whole amount of their bid after the raffle is settled."
             />
             <Rule
               heading="No luck?"
@@ -173,7 +173,7 @@ export const InfoAccordion = () => {
               <Bold>until {formatEndDate(redeemTimestamp)}</Bold>). Once you have input your voucher code into our
               ticket portal, you will go through the standard ticket checkout flow. You can go to{' '}
               <Link href="https://tickets.devcon.org/">our ticket shop here</Link> to redeem your voucher code for a
-              EthCC 6 ticket. See you at the conference!
+              EthCC[6] ticket. See you at the conference!
             </span>
           </StyledContent>
         </Accordion.Item>
@@ -206,7 +206,7 @@ const AccordionStyledTrigger = ({ heading }: AccordionTriggerProps) => {
   return (
     <StyledTrigger>
       <span>{heading}</span>
-      <AccordionArrow color={Colors.Black} size={22} />
+      <AccordionArrow color={Colors.White} size={22} />
     </StyledTrigger>
   )
 }
@@ -226,10 +226,12 @@ const StyledTrigger = styled(Accordion.AccordionTrigger)`
   justify-content: space-between;
   align-items: center;
   padding: 4px 8px 4px 4px;
-  font-family: 'Space Mono', 'Roboto Mono', monospace;
+  font-family: 'Jetbrains Mono', 'Space Mono', 'Roboto Mono', monospace;
   font-style: normal;
   border: none;
-  background-color: ${Colors.GreenLight};
+  background-color: ${Colors.Violet};
+  color: ${Colors.White};
+  padding-left: 10px;
   text-align: left;
   font-size: 20px;
   line-height: 1.5;

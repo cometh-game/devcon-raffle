@@ -9,6 +9,7 @@ interface BidWithAddress {
   bid: {
     bidderID: BigNumber
     amount: BigNumber
+    discount: BigNumber
     winType: number
     claimed: boolean
   }
@@ -35,6 +36,7 @@ export function useContractBids(): Bid[] {
         bidderID: fetchedBid.bid.bidderID,
         bidderAddress: fetchedBid.bidder,
         amount: fetchedBid.bid.amount,
+        discount: fetchedBid.bid.discount,
         place: -1,
       })) ?? []
     )

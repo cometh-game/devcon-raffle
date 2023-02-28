@@ -10,6 +10,6 @@ interface WhichWallet {
 export function useWhichWallet(): WhichWallet {
   const { library } = useEthers()
   const { isBraveWallet } = (window.ethereum as any) ?? {}
-  const { isMetaMask, bridge: isWalletConnect, isPortis } = (library as any).provider ?? {}
+  const { isMetaMask, bridge: isWalletConnect, isPortis } = (library as any)?.provider ?? {}
   return { isMetaMask, isBraveWallet, isWalletConnect, isPortis }
 }

@@ -25,10 +25,11 @@ const TitleBanner = styled.div`
   align-items: center;
   width: 100%;
   padding: 4px 0;
-  background-color: ${Colors.GreenLight};
+  background-color: ${Colors.Violet};
 `
 
 const SubListHeader = styled.h3`
   font-size: 20px;
   line-height: 150%;
+  color: ${Colors.White};
 `

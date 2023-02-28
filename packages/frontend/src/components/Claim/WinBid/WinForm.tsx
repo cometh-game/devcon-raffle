@@ -1,11 +1,11 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { useEthers } from '@usedapp/core'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { TxFlowSteps } from 'src/components/Auction'
-import { VoucherForm, WinBidForm, WinType } from 'src/components/Claim'
+import { WinBidForm } from 'src/components/Claim'
 import { FormWrapper } from 'src/components/Form/Form'
+import { useIsTicketClaimed } from 'src/hooks/backend/useIsTicketClaimed'
 import { UserBid } from 'src/models/Bid'
-import { Colors } from 'src/styles/colors'
 import styled from 'styled-components'
 
 interface WinFormProps {
@@ -16,66 +16,19 @@ interface WinFormProps {
 
 export const WinForm = ({ userBid, withdrawalAmount, setView }: WinFormProps) => {
   const { account } = useEthers()
-  const [voucher, setVoucher] = useState<string>()
-  const isBidWithdrawn = userBid.claimed || userBid.winType === WinType.Auction
+  const { claimed, isClaimed } = useIsTicketClaimed()
 
   useEffect(() => {
-    setVoucher(undefined)
-  }, [account])
-
-  if (!voucher) {
-    return (
-      <Wrapper>
-        <WinBidForm
-          userBid={userBid}
-          withdrawalAmount={withdrawalAmount}
-          setView={setView}
-          voucher={voucher}
-          setVoucher={setVoucher}
-        />
-      </Wrapper>
-    )
-  }
+    claimed(account)
+  }, [account, claimed])
 
   return (
-    <>
-      {isBidWithdrawn ? (
-        <Wrapper>
-          <VoucherForm voucher={voucher} withdrawnBid={isBidWithdrawn} />
-        </Wrapper>
-      ) : (
-        <WrapperRow>
-          <WinFormWrapper>
-            <WinBidForm
-              userBid={userBid}
-              withdrawalAmount={withdrawalAmount}
-              setView={setView}
-              voucher={voucher}
-              setVoucher={setVoucher}
-            />
-          </WinFormWrapper>
-          <VoucherFormWrapper>
-            <VoucherForm voucher={voucher} withdrawnBid={userBid.claimed} />
-          </VoucherFormWrapper>
-        </WrapperRow>
-      )}
-    </>
+    <Wrapper>
+      <WinBidForm userBid={userBid} withdrawalAmount={withdrawalAmount} setView={setView} isClaimed={isClaimed} />
+    </Wrapper>
   )
 }
 
 const Wrapper = styled(FormWrapper)`
   justify-content: center;
-`
-
-const WrapperRow = styled.div`
-  display: flex;
-  width: 100%;
-`
-const WinFormWrapper = styled(FormWrapper)`
-  justify-content: flex-start;
-  padding: 72px 35px 0;
-`
-
-const VoucherFormWrapper = styled(WinFormWrapper)`
-  background-color: ${Colors.BlueDark};
 `

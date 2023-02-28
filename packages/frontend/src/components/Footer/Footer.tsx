@@ -1,4 +1,4 @@
-import { TruefiLogoIcon } from 'src/components/Icons'
+import { ComethLogoIcon, TruefiLogoIcon } from 'src/components/Icons'
 import { Colors, hexOpacity } from 'src/styles/colors'
 import styled from 'styled-components'
 
@@ -10,11 +10,10 @@ export const Footer = () => {
         <LogoLink href="https://truefi.io/" target="_blank" rel="noopener noreferrer">
           <TruefiLogoIcon />
         </LogoLink>
-        {/* <p>adapted by</p>
+        <p>customized by</p>
         <LogoLink href="https://cometh.io/" target="_blank" rel="noopener noreferrer">
           <ComethLogoIcon />
         </LogoLink>
-        <p>for EthCC</p> */}
       </FooterRow>
     </FooterContainer>
   )

@@ -18,12 +18,12 @@ interface Props {
 
 export const Web3ModalProvider = ({ children }: Props) => {
   const { activate } = useEthers()
-  // const { isBraveWallet } = useWhichWallet()
+  const { isBraveWallet } = useWhichWallet() // TODO: check Brave again?
   const { chainName, chainId, rpcUrl } = useDefaultNetwork()
 
   const injectedOptions = {
     display: {
-      name: /*isBraveWallet ? 'BraveWallet' :*/ 'MetaMask',
+      name: isBraveWallet ? 'BraveWallet' : 'MetaMask',
       description: 'Connect with the provider in your Browser',
     },
     package: null,
@@ -85,7 +85,7 @@ export const Web3ModalProvider = ({ children }: Props) => {
   const web3Modal = useMemo(
     () =>
       new Web3Modal({
-        network: chainName === 'Arbitrum' ? 'arbitrum' : 'arbitrum-rinkeby',
+        network: chainName === 'Ethereum' ? 'ethereum' : 'Goerli',
         cacheProvider: true,
         providerOptions,
       }),

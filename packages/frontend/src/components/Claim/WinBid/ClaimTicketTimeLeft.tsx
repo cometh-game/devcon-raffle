@@ -5,7 +5,7 @@ import { setIntervalImmediately } from 'src/utils'
 import { formatTimeLeft } from 'src/utils/formatters'
 import styled from 'styled-components'
 
-export const VoucherTimeLeft = () => {
+export const ClaimTicketTimeLeft = () => {
   const redeemDeadline = useVoucherRedeemDeadline()
   const [timeLeft, setTimeLeft] = useState(formatTimeLeft(redeemDeadline))
 
@@ -17,7 +17,7 @@ export const VoucherTimeLeft = () => {
   return (
     <TimeRow>
       <RemainingTime>{timeLeft}</RemainingTime>
-      <span>left to redeem your voucher code</span>
+      <span>left to claim your ticket</span>
     </TimeRow>
   )
 }
@@ -35,5 +35,5 @@ const TimeRow = styled.div`
 const RemainingTime = styled.span`
   font-size: 24px;
   font-weight: 700;
-  font-family: 'Space Mono', 'Roboto Mono', monospace;
+  font-family: 'Jetbrains Mono', 'Space Mono', 'Roboto Mono', monospace;
 `

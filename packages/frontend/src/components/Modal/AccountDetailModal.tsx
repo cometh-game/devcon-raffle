@@ -5,6 +5,7 @@ import { CopyButton, RedirectButton } from 'src/components/Buttons'
 import { Button } from 'src/components/Buttons/Button'
 import { ContentRow, Modal } from 'src/components/Modal/Modal'
 import { useWeb3Modal, useWhichWallet } from 'src/hooks'
+import { useLogout } from 'src/hooks/backend/useLogout'
 import { useChainId } from 'src/hooks/chainId/useChainId'
 import { Colors } from 'src/styles/colors'
 import { getExplorerAddressLink } from 'src/utils/getExplorerLink'
@@ -24,6 +25,7 @@ export const AccountDetailModal = ({ isShown, onRequestClose }: ModalProps) => {
   const chainId = useChainId()
   const [wallet, setWallet] = useState('-')
   const { isBraveWallet } = useWhichWallet()
+  const { logout } = useLogout()
 
   useEffect(() => {
     setWallet(getWalletName(web3Modal.cachedProvider, isBraveWallet))
@@ -39,8 +41,9 @@ export const AccountDetailModal = ({ isShown, onRequestClose }: ModalProps) => {
     localStorage.removeItem('walletconnect')
     removeWalletLinkStorage()
     web3Modal.clearCachedProvider()
+    logout()
     deactivate()
-  }, [onRequestClose, deactivate, web3Modal])
+  }, [onRequestClose, deactivate, web3Modal, logout])
 
   return (
     <Modal isShown={isShown} onRequestClose={onRequestClose} title="Your account">
@@ -89,7 +92,7 @@ const AccountIcon = styled.div`
 `
 
 const AccountAddress = styled.p`
-  font-family: 'Space Mono', 'Roboto Mono', monospace;
+  font-family: 'Jetbrains Mono', 'Space Mono', 'Roboto Mono', monospace;
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;

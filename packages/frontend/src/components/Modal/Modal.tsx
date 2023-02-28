@@ -68,7 +68,7 @@ const Header = styled.div`
 `
 
 const Title = styled(Dialog.Title)`
-  font-family: 'Space Mono', 'Roboto Mono', monospace;
+  font-family: 'Jetbrains Mono', 'Space Mono', 'Roboto Mono', monospace;
   font-weight: 700;
   font-size: 16px;
   line-height: 24px;

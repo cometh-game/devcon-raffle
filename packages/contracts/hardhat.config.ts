@@ -1,4 +1,5 @@
 import 'hardhat-deploy'
+import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
 import './abi-exporter'

@@ -79,7 +79,7 @@ export const ReviewForm = ({
       {discount > 0 && (
         <FormRow>
           <Discount>
-            You are eligible to a discount. A {discount}% discount will be applied at the end of the raffle.
+            You are eligible for a discount. A {discount}% discount will be applied at the end of the raffle.
           </Discount>
         </FormRow>
       )}

@@ -48,7 +48,6 @@ async function switchOrAddChain(library: JsonRpcProvider, chainId: SupportedChai
       await addChain(library)
     }
   }
-  window.location.reload() // HACK: the app kinda crashes when a network change occurs :(
 }
 
 async function addChain(library: JsonRpcProvider) {

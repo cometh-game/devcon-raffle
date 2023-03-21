@@ -31,7 +31,16 @@ const StyledHeader = styled(HeaderBar)`
   flex-shrink: 0;
   width: 100%;
   position: relative;
-  background: linear-gradient(to left, #2800A5 0%, #4B00FF 16.66%, #6400FF 33.33%, #8C00F0 50%, #DF00A6 66%, #FF005F 83.33%, #FF0000 100%);
+  background: linear-gradient(
+    to left,
+    #2800a5 0%,
+    #4b00ff 16.66%,
+    #6400ff 33.33%,
+    #8c00f0 50%,
+    #df00a6 66%,
+    #ff005f 83.33%,
+    #ff0000 100%
+  );
 `
 
 const Wrapper = styled.div`
@@ -47,15 +56,4 @@ const Title = styled.div`
   flex-direction: column;
   align-items: center;
   row-gap: 8px;
-`
-
-const Key = styled.div`
-  position: absolute;
-  bottom: -5px;
-  right: 68px;
-  height: 225px;
-`
-
-const Number = styled.h2`
-  color: ${Colors.BlueDark};
 `

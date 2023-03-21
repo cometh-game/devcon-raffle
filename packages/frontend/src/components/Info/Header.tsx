@@ -3,7 +3,6 @@ import { Colors } from 'src/styles/colors'
 import styled from 'styled-components'
 
 import background from '../../assets/ethcc-background.svg'
-
 import { HeaderBar } from '../common/Header'
 
 import { ClaimTicketTimeLeft } from './ClaimTicketTimeLeft'

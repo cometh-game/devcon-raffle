@@ -1,12 +1,11 @@
 import { getWarningText } from 'src/components/Auction'
 import { Button } from 'src/components/Buttons'
 import { FormHeading, FormRow, FormWrapper } from 'src/components/Form/Form'
-import { useContractState, useSwitchChain, useWhichWallet } from 'src/hooks'
+import { useContractState, useSwitchChain } from 'src/hooks'
 import { Colors } from 'src/styles/colors'
 import styled from 'styled-components'
 
 export const ChainIdWarning = () => {
-  const { isMetaMask, isWalletConnect, isPortis } = useWhichWallet()
   const switchChain = useSwitchChain()
   const { state } = useContractState()
   const text = getWarningText(state)
@@ -33,7 +32,7 @@ export const ChainIdWarning = () => {
           »
         </span>
       </FormRow>
-      {isMetaMask && !isWalletConnect && !isPortis && <Button onClick={switchChain}>Change network</Button>}
+      <Button onClick={switchChain}>Change network</Button>
     </FormWrapper>
   )
 }

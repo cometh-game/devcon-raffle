@@ -1,3 +1,5 @@
+import JetbrainsMonoBold from './fonts/JetBrainsMono/JetBrainsMono-Bold.woff2'
+import JetbrainsMonoRegular from './fonts/JetBrainsMono/JetBrainsMono-Regular.woff2'
 import RobotoBoldWoff from './fonts/Roboto/Roboto-Bold.woff'
 import RobotoBoldWoff2 from './fonts/Roboto/Roboto-Bold.woff2'
 import RobotoMediumWoff from './fonts/Roboto/Roboto-Medium.woff'
@@ -8,9 +10,6 @@ import SpaceMonoBoldWoff from './fonts/SpaceMono/SpaceMono-Bold.woff'
 import SpaceMonoBoldWoff2 from './fonts/SpaceMono/SpaceMono-Bold.woff2'
 import SpaceMonoRegularWoff from './fonts/SpaceMono/SpaceMono-Regular.woff'
 import SpaceMonoRegularWoff2 from './fonts/SpaceMono/SpaceMono-Regular.woff2'
-import JetbrainsMonoRegular from './fonts/JetBrainsMono/JetBrainsMono-Regular.woff2'
-import JetbrainsMonoBold from './fonts/JetBrainsMono/JetBrainsMono-Bold.woff2'
-
 
 export const fonts = `
   /* Roboto Font Family */

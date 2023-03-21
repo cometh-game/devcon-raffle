@@ -29,7 +29,7 @@ const Container = styled.div`
   align-items: center;
   width: 100%;
   height: 90px;
-  background-color: #4B00FF;
+  background-color: #4b00ff;
 `
 
 const Section = styled.div`

@@ -204,22 +204,6 @@ export const InfoAccordion = () => {
             those wallets that collected previous EthCC Poaps.
           </StyledContent>
         </Accordion.Item>
-
-        <Accordion.Item value="item-8">
-          <StyledHeader>
-            <AccordionStyledTrigger heading="Other FAQ" />
-          </StyledHeader>
-          <StyledContent>
-            <span>
-              Please read our Terms & Conditions{' '}
-              <Link href="https://docs.google.com/document/d/1pVU-G8mpPD33EwOwE96MTB_4AZrYa2TNWXLSfkOPCJQ/edit?usp=sharing">
-                here
-              </Link>{' '}
-              as well as our full Auction & Raffle FAQ on our website{' '}
-              <Link href="https://devcon.org/en/raffle-auction/">here</Link>.
-            </span>
-          </StyledContent>
-        </Accordion.Item>
       </Accordion.Root>
     </Wrapper>
   )

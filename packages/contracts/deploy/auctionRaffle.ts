@@ -1,7 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types"
 import { DeployFunction } from "hardhat-deploy/types"
 import { config } from '../scripts/deploymentConfig'
-import { ethers } from "ethers"
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 	const {
@@ -9,7 +8,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 	} = hre
 	const [deployer] = await hre.ethers.getSigners()
 
-	let factory = await deploy("AuctionRaffle", {
+	let raffle = await deploy("AuctionRaffle", {
 		from: deployer.address,
 		args: [
       config.initialOwner,
@@ -20,10 +19,25 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       config.raffleWinnersCount,
       config.reservePrice,
       config.minBidIncrement,
-      ethers.utils.defaultAbiCoder.encode(['uint256'], ['0x0'])
+      config.discountsMerkleRoot
     ],
 		log: true,
 	})
+
+  await hre.run("verify:verify", {
+    address: raffle.address,
+    constructorArguments: [
+      config.initialOwner,
+      config.biddingStartTime,
+      config.biddingEndTime,
+      config.claimingEndTime,
+      config.auctionWinnersCount,
+      config.raffleWinnersCount,
+      config.reservePrice,
+      config.minBidIncrement,
+      config.discountsMerkleRoot
+    ],
+  })
 }
 
 export default func

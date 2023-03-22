@@ -39,7 +39,8 @@ module.exports = {
       },
     },
     goerli: {
-      url: 'https://rpc.ankr.com/eth_goerli',
+      url: 'https://goerli.blockpi.network/v1/rpc/public',
+      //url: 'https://rpc.ankr.com/eth_goerli',
       accounts: [process.env.DEPLOYER || zeroPrivateKey]
     },
     rinkeby: {

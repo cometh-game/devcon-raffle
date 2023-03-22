@@ -12,7 +12,7 @@ export function getTestnetProdConfig(): Config {
       ...commonUseDAppConfig,
       readOnlyChainId: Goerli.chainId,
       readOnlyUrls: providerWithInterval(Goerli.chainId, POLLING_INTERVAL),
-      networks: [Goerli],
+      networks: [{ ...Goerli, rpcUrl: 'https://goerli.blockpi.network/v1/rpc/public' }],
       pollingInterval: POLLING_INTERVAL,
     },
     addresses: getAddresses(),

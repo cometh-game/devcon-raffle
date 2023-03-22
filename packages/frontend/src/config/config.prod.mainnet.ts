@@ -12,7 +12,7 @@ export function getMainnetProdConfig(): Config {
       ...commonUseDAppConfig,
       readOnlyChainId: Mainnet.chainId,
       readOnlyUrls: providerWithInterval(Mainnet.chainId, POLLING_INTERVAL),
-      networks: [Mainnet],
+      networks: [{ ...Mainnet, rpcUrl: 'https://eth.llamarpc.com' }],
       pollingInterval: POLLING_INTERVAL,
     },
     addresses: ADDRESSES,

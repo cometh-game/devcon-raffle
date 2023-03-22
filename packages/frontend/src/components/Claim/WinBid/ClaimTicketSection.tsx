@@ -94,7 +94,7 @@ export const ClaimTicketSection = ({
           </Button>
         </>
       )}
-      {state !== 'ClaimingClosed' && <ClaimTicketTimeLeft />}
+      {state !== 'ClaimingClosed' && message === undefined && <ClaimTicketTimeLeft />}
     </VoucherOption>
   )
 }

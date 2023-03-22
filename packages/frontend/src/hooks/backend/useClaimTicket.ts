@@ -32,7 +32,7 @@ export function useClaimTicket() {
       switch (response?.status) {
         case 201:
           setClaimTicketStatus('success')
-          return { message: 'Ticket claimed succesfully!' }
+          return { message: 'The ticket is on its way and will arrive shortly.' }
         case 200:
           setClaimTicketStatus('error')
           return { error: 'Ticket already claimed.' }

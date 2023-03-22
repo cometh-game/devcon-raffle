@@ -71,7 +71,10 @@ export const ClaimTicketSection = ({
       {displayClaimTicketForm && !shouldHideActions && (
         <>
           <h2>Claim Ticket</h2>
-          <div>Please fill this form so that we can send your ticket later!</div>
+          <div>
+            Please fill in this form with your correct information for your ticket! You will receive it through mail
+            soon!
+          </div>
           <ClaimTicketForm>
             <FormField>
               <FormLabel htmlFor="firstName">First Name:</FormLabel>

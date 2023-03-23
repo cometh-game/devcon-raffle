@@ -32,7 +32,12 @@ const FooterRow = styled.div`
   display: flex;
   align-items: center;
   column-gap: 16px;
-  padding: 16px 0;
+  padding: 16px 0 16px 16px;
+
+  @media only screen and (max-width: 800px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
 `
 
 const LogoLink = styled.a`

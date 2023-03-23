@@ -227,6 +227,14 @@ const Wrapper = styled.div`
   max-width: 1252px;
   margin: 0 auto;
   padding: 68px 125px 68px 68px;
+
+  @media only screen and (max-width: 1024px) {
+    max-width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
 `
 const StyledHeader = styled(Accordion.Header)`
   width: 100%;

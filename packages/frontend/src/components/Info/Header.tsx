@@ -42,6 +42,10 @@ const StyledHeader = styled(HeaderBar)`
 
   #background-image: url(${background});
   #background-size: cover;
+
+  @media only screen and (max-width: 800px) {
+    height: auto;
+  }
 `
 
 const HeaderWrapper = styled.div`

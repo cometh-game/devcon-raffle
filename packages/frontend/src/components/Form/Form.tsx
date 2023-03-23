@@ -35,6 +35,10 @@ export const FormWrapper = styled.div`
   row-gap: 16px;
   padding: 82px 115px 82px 170px;
   width: 100%;
+
+  @media only screen and (max-width: 800px) {
+    padding: 82px 115px 82px 115px;
+  }
 `
 
 export const FormSectionWrapper = styled(FormWrapper)`

@@ -8,6 +8,7 @@ export const GlobalStyles = createGlobalStyle`
 
   *, *:before, *:after {
     box-sizing: border-box;
+    font-size:calc(12px + 1.5vw);
   }
 
   html, body {

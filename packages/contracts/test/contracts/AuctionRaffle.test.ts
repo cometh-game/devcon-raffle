@@ -44,7 +44,7 @@ describe('AuctionRaffle', function () {
     bidderAddress = await auctionRaffle.signer.getAddress()
     bidderProof = discountTree.getHexProof(hashDiscount(bidderAddress, discounts[0]))
   })
-
+  
   it.skip('should handle the load with 500 participants (TAKES A LONG TIME)', async function () {
     this.timeout(500000);
 

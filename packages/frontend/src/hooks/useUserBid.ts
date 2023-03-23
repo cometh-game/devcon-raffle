@@ -9,6 +9,7 @@ import { UserBid } from 'src/models/Bid'
 interface ContractBid {
   bidderID: BigNumber
   amount: BigNumber
+  discount: BigNumber
   winType: number
   claimed: boolean
 }
@@ -68,5 +69,5 @@ function isClaimed(reservePrice: BigNumber | undefined, bid: ContractBid): boole
     return false
   }
 
-  return bid.amount.eq(reservePrice)
+  return bid.amount.eq(reservePrice.sub(bid.discount))
 }

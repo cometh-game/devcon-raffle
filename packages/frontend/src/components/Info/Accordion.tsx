@@ -1,7 +1,9 @@
+import { formatEther } from '@ethersproject/units'
 import * as Accordion from '@radix-ui/react-accordion'
 import { ArrowDownIcon } from 'src/components/Icons'
 import { Rule, RuleText } from 'src/components/Info/Rules'
 import { useAuctionWinnersCount } from 'src/hooks/useAuctionWinnersCount'
+import { useMinimumBid } from 'src/hooks/useMinimumBid'
 import { useRaffleWinnersCount } from 'src/hooks/useRaffleWinnersCount'
 import { useVoucherRedeemDeadline } from 'src/hooks/useVoucherRedeemDeadline'
 import { Colors } from 'src/styles/colors'
@@ -9,11 +11,11 @@ import { formatEndDate } from 'src/utils/formatters'
 import styled from 'styled-components'
 
 export const InfoAccordion = () => {
-  const auctionWinnersCount = useAuctionWinnersCount()
-  const raffleWinnersCount = useRaffleWinnersCount()
+  const auctionWinnersCount = useAuctionWinnersCount() || 0
+  const raffleWinnersCount = useRaffleWinnersCount() || 0
   const redeemTimestamp = useVoucherRedeemDeadline()
   const totalCount = auctionWinnersCount && raffleWinnersCount && auctionWinnersCount + raffleWinnersCount
-  const reservePrice = 0.25
+  const reservePrice = formatEther(useMinimumBid())
   const exampleBid = 0.5
 
   return (
@@ -24,16 +26,20 @@ export const InfoAccordion = () => {
             <AccordionStyledTrigger heading="What is this?" />
           </StyledHeader>
           <StyledContent>
-            In an effort to make our ticket distribution more efficient and fair, we are selling a{' '}
-            <Italic>portion</Italic> of this year’s tickets via an on-chain Auction & Raffle. Typically we sell tickets
-            in waves; attendees need to wait for a specific release time and refresh the ticket shop rapidly in order to{' '}
-            <Italic>hope</Italic> to claim & checkout with a ticket. Not to mention the need for a speedy internet
-            connection and crossing your fingers that you’re close enough to our ticketing servers to be one of the
-            first to secure a ticket.
+            Feeling a bit of déjà vu? That’s because we liked what Devcon did with their crypto auction and raffle so
+            much that we decided to fork it for EthCC[6]. A massive "thank you" to the Devcon team for their support!
             <br />
             <br />
-            This year, we wanted to try something different, so we are experimenting with an on-chain Auction & Raffle
-            to sell a <Italic>portion</Italic> of EthCC tickets.
+            So what does this mean for you? In an effort to make our ticket distribution more efficient and fair, we are
+            selling a <Italic>portion</Italic> of this year’s tickets via an on-chain Auction & Raffle. Typically we
+            sell tickets in waves; attendees need to wait for a specific release time and refresh the ticket shop
+            rapidly in order to <Italic>hope</Italic> to claim & checkout with a ticket. Not to mention the need for a
+            speedy internet connection and crossing your fingers that you’re close enough to our ticketing servers to be
+            one of the first to secure a ticket.
+            <br />
+            <br />
+            This year, we want to try something different, so we are experimenting with an on-chain Auction & Raffle to
+            sell a <Italic>portion</Italic> of EthCC tickets.
           </StyledContent>
         </Accordion.Item>
 
@@ -43,11 +49,12 @@ export const InfoAccordion = () => {
           </StyledHeader>
           <StyledContent>
             Join the contest by submitting a bid for the ticket based on the amount you would value having a EthCC
-            ticket. Bid high to compete for the 20 tickets distributed in the auction, or be entered into the raffle for
-            a chance to buy a ticket at the reserve price. You need to bid at least the reserve price, which is set to
-            the price of a standard EthCC ticket at time of publication: <Bold>{reservePrice} ETH.</Bold> Please note
-            there is a one-person-one-bid rule in place. You will need to submit your name at check-out, and we will
-            check IDs at EthCC to verify that the participant is the ticket holder.
+            ticket. Bid high to compete for the {auctionWinnersCount} tickets distributed in the auction, or be entered
+            into the raffle for a chance to buy a ticket at the reserve price. You need to bid at least the reserve
+            price, which is set to the price of a standard EthCC ticket at time of publication:{' '}
+            <Bold>{reservePrice} ETH.</Bold> Please note there is a one-person-one-bid rule in place. You will need to
+            submit your name at check-out, and we will check IDs at EthCC to verify that the participant is the ticket
+            holder.
           </StyledContent>
         </Accordion.Item>
 
@@ -57,11 +64,11 @@ export const InfoAccordion = () => {
           </StyledHeader>
           <StyledContent>
             Place a bid of at least {reservePrice} ETH for a chance to win a EthCC ticket. If your bid is in the top{' '}
-            {auctionWinnersCount}, you will win a EthCC ticket in exchange for the amount you paid in your bid. At any
-            point, you can top up your bid if you want. If your bid is not in the top {auctionWinnersCount}, you will be
-            entered into a raffle and may be randomly chosen to win a EthCC ticket — if you were randomly selected in
-            the Raffle & bid more than the reserve price, you can withdraw the difference. If you do not win, you can
-            withdraw your entire bid, minus a 2% sybil-resistance fee.
+            {auctionWinnersCount}, you will win a EthCC ticket in exchange for the amount you paid in your bid. If you'd
+            like, you can top up your bid at any point during the auction. If your bid is not in the top{' '}
+            {auctionWinnersCount}, you will be entered into a raffle and may be randomly chosen to win a EthCC ticket —
+            if you were randomly selected in the Raffle & bid more than the reserve price, you can withdraw the
+            difference. If you do not win, you can withdraw your entire bid, minus a 2% sybil-resistance fee.
           </StyledContent>
         </Accordion.Item>
 
@@ -83,12 +90,12 @@ export const InfoAccordion = () => {
               heading={`Raffle pool: ${raffleWinnersCount} tickets`}
               rule={`From participants who bid below the last bid in the auction pool, ${raffleWinnersCount} will be chosen at random. A winner in that pool will receive a ticket for ${reservePrice} ETH. All funds that they bid over that price will be claimable after the raffle is settled.`}
               example={`You bid ${exampleBid} ETH and end up below the top ${auctionWinnersCount}. If you are selected in the raffle, you pay ${reservePrice} ETH for the ticket and get ${(
-                exampleBid - reservePrice
+                exampleBid - Number.parseFloat(reservePrice)
               ).toFixed(2)} ETH back.`}
             />
             <Rule
               heading="Golden Ticket: 1 ticket"
-              rule="One lucky bidder from the raffle pool will receive a ticket for EthCC 6 totally for free! The Golden Ticket winner will be able to claim the whole amount of their bid after the raffle is settled."
+              rule="One lucky bidder from the raffle pool will receive a ticket for EthCC[6] totally for free! The Golden Ticket winner will be able to claim the whole amount of their bid after the raffle is settled."
             />
             <Rule
               heading="No luck?"
@@ -98,32 +105,34 @@ export const InfoAccordion = () => {
               } ETH back.`}
             />
             <Rule
-              heading="What if there’s less than 100 participants?"
+              heading={`What if there are fewer than ${auctionWinnersCount + raffleWinnersCount} participants?`}
               rule={
                 <>
                   In the event there are:
                   <BulletList>
                     <li>
                       <ListText>
-                        <Bold>1-80 participants:</Bold> All bidders win in the raffle.
+                        <Bold>1-{raffleWinnersCount} participants:</Bold> All bidders win in the raffle.
                       </ListText>
                     </li>
                     <li>
                       <ListText>
-                        <Bold>81 participants:</Bold> Top 1 bidder wins in the auction. 80 remaining bidders win in the
-                        raffle.
+                        <Bold>{raffleWinnersCount + 1} participants:</Bold> Top 1 bidder wins in the auction.{' '}
+                        {raffleWinnersCount} remaining bidders win in the raffle.
                       </ListText>
                     </li>
                     <li>
                       <ListText>
-                        <Bold>101 participants:</Bold> Top 20 bidders win in the auction. Out of 81 remaining bidders,
-                        80 are randomly chosen to win in the raffle.
+                        <Bold>{auctionWinnersCount + raffleWinnersCount + 1} participants:</Bold> Top{' '}
+                        {auctionWinnersCount} bidders win in the auction. Out of {raffleWinnersCount + 1} remaining
+                        bidders, {raffleWinnersCount} are randomly chosen to win in the raffle.
                       </ListText>
                     </li>
                     <li>
                       <ListText>
-                        <Bold>120 participants:</Bold> Top 20 bidders win in the auction. Out of 100 remaining bidders,
-                        80 are randomly chosen to win in the raffle.
+                        <Bold>{auctionWinnersCount + raffleWinnersCount + 20} participants:</Bold> Top{' '}
+                        {auctionWinnersCount} bidders win in the auction. Out of {raffleWinnersCount + 20} remaining
+                        bidders, {raffleWinnersCount} are randomly chosen to win in the raffle.
                       </ListText>
                     </li>
                   </BulletList>
@@ -151,41 +160,48 @@ export const InfoAccordion = () => {
             <AccordionStyledTrigger heading="In what form will I get the ticket?" />
           </StyledHeader>
           <StyledContent>
-            After the raffle is settled, you will have 48 hours (<Bold>until {formatEndDate(redeemTimestamp)}</Bold>) to
-            claim your voucher code for the ticket. In order to do so, you will be asked to sign a message using your
-            wallet to authenticate as the owner of the winning account. The voucher code will be presented to you on
-            this page.
+            After the raffle is settled, you will have 4 days (<Bold>until {formatEndDate(redeemTimestamp)}</Bold>) to
+            fill in a form presented to you on this page. In order to do so, you will be asked to sign a message using
+            your wallet to authenticate as the owner of the winning account. You will then receive your ticket through
+            mail!
           </StyledContent>
         </Accordion.Item>
 
         <Accordion.Item value="item-6">
           <StyledHeader>
-            <AccordionStyledTrigger heading="Okay, I got a voucher code. What do I do now?" />
+            <AccordionStyledTrigger heading="Why fork the Devcon Raffle / Auction?" />
           </StyledHeader>
           <StyledContent>
-            <span>
-              Your Voucher Code will be available to you for 48 hours after the closing of the Auction & Raffle (
-              <Bold>until {formatEndDate(redeemTimestamp)}</Bold>). Once you have input your voucher code into our
-              ticket portal, you will go through the standard ticket checkout flow. You can go to{' '}
-              <Link href="https://tickets.devcon.org/">our ticket shop here</Link> to redeem your voucher code for a
-              EthCC 6 ticket. See you at the conference!
-            </span>
+            <ul>
+              <li>The system already developed is very similar to our needs</li>
+              <li>The features we want to add could benefit others</li>
+              <li>
+                The authors of the solution used for Devcon validated our approach and gave us support to reuse their
+                code base
+              </li>
+            </ul>
           </StyledContent>
         </Accordion.Item>
 
         <Accordion.Item value="item-7">
           <StyledHeader>
-            <AccordionStyledTrigger heading="Other FAQ" />
+            <AccordionStyledTrigger heading="Improvements & added features" />
           </StyledHeader>
           <StyledContent>
+            <strong>Using RANDAO to draw the raffle winners</strong>
             <span>
-              Please read our Terms & Conditions{' '}
-              <Link href="https://docs.google.com/document/d/1pVU-G8mpPD33EwOwE96MTB_4AZrYa2TNWXLSfkOPCJQ/edit?usp=sharing">
-                here
-              </Link>{' '}
-              as well as our full Auction & Raffle FAQ on our website{' '}
-              <Link href="https://devcon.org/en/raffle-auction/">here</Link>.
+              What exactly is RANDAO? Simply put, it’s a decentralized mechanism for generating "reasonably random"
+              numbers. Instead of trusting one person to come up with a random number on everyone’s behalf, RANDAO has a
+              large group of people come together to generate a random number collectively.{' ('}
+              <Link href="https://eth2book.info/altair/part2/building_blocks/randomness" target="_blank">
+                source
+              </Link>
+              {') '}
             </span>
+            <strong>Apply a discount to raffle winners</strong>
+            We’re offering a loyalty discount to raffle winners who have attended previous editions of EthCC. Based on a
+            snapshot we made for previous attendees, we have added a system in the contract which applies discounts for
+            those wallets that collected previous EthCC Poaps.
           </StyledContent>
         </Accordion.Item>
       </Accordion.Root>
@@ -201,7 +217,7 @@ const AccordionStyledTrigger = ({ heading }: AccordionTriggerProps) => {
   return (
     <StyledTrigger>
       <span>{heading}</span>
-      <AccordionArrow color={Colors.Black} size={22} />
+      <AccordionArrow color={Colors.White} size={22} />
     </StyledTrigger>
   )
 }
@@ -211,6 +227,14 @@ const Wrapper = styled.div`
   max-width: 1252px;
   margin: 0 auto;
   padding: 68px 125px 68px 68px;
+
+  @media only screen and (max-width: 1024px) {
+    max-width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
 `
 const StyledHeader = styled(Accordion.Header)`
   width: 100%;
@@ -221,10 +245,12 @@ const StyledTrigger = styled(Accordion.AccordionTrigger)`
   justify-content: space-between;
   align-items: center;
   padding: 4px 8px 4px 4px;
-  font-family: 'Space Mono', 'Roboto Mono', monospace;
+  font-family: 'Jetbrains Mono', 'Space Mono', 'Roboto Mono', monospace;
   font-style: normal;
   border: none;
-  background-color: ${Colors.GreenLight};
+  background-color: ${Colors.Violet};
+  color: ${Colors.White};
+  padding-left: 10px;
   text-align: left;
   font-size: 20px;
   line-height: 1.5;

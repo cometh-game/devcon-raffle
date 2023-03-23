@@ -1,4 +1,5 @@
 import 'hardhat-deploy'
+import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
 import './abi-exporter'
@@ -37,12 +38,17 @@ module.exports = {
         count: 120
       },
     },
-    mumbai: {
-      url: 'https://rpc.ankr.com/polygon_mumbai',
-      accounts: [process.env.DEPLOYER || zeroPrivateKey],
+    goerli: {
+      url: 'https://goerli.blockpi.network/v1/rpc/public',
+      //url: 'https://rpc.ankr.com/eth_goerli',
+      accounts: [process.env.DEPLOYER || zeroPrivateKey]
     },
     rinkeby: {
       url: 'https://rinkeby.arbitrum.io/rpc',
+      accounts: [process.env.DEPLOYER || zeroPrivateKey]
+    },
+    mumbai: {
+      url: 'https://rpc.ankr.com/polygon_mumbai',
       accounts: [process.env.DEPLOYER || zeroPrivateKey]
     },
     ethereum: {

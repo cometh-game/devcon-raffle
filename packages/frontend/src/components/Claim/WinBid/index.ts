@@ -1,4 +1,4 @@
-export * from './ClaimVoucherSection'
+export * from './ClaimTicketSection'
 export * from './VoucherForm'
 export * from './WinBidFlow'
 export * from './WinBidForm'

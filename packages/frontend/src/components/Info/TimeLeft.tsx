@@ -33,7 +33,7 @@ const TimeBox = styled.div`
   display: flex;
   flex-direction: column;
   row-gap: 4px;
-  font-family: 'Space Mono', 'Roboto Mono', monospace;
+  font-family: 'Jetbrains Mono', 'Space Mono', 'Roboto Mono', monospace;
 
   @media screen and (min-width: 1800px) {
     flex-direction: row;

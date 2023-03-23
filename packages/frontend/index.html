@@ -2,17 +2,40 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/assets/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/src/assets/ethcc-logo.svg" />
     <link rel="preload" as="font" crossorigin type="font/woff2" href="/src/styles/fonts/Roboto/Roboto-Regular.woff2" >
     <link rel="preload" as="font" crossorigin type="font/woff2" href="/src/styles/fonts/Roboto/Roboto-Medium.woff2" >
     <link rel="preload" as="font" crossorigin type="font/woff2" href="/src/styles/fonts/Roboto/Roboto-Bold.woff2" >
     <link rel="preload" as="font" crossorigin type="font/woff2" href="/src/styles/fonts/SpaceMono/SpaceMono-Regular.woff2">
     <link rel="preload" as="font" crossorigin type="font/woff2" href="/src/styles/fonts/SpaceMono/SpaceMono-Bold.woff2">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EthCC 6 Auction & Raffle Ticket Sale</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- Primary Meta Tags -->
+    <title>EthCC[6] Auction & Raffle</title>
+    <meta name="title" content="EthCC[6] Auction & Raffle">
+    <meta name="description" content="EthCC[6] Auction / Raffle -- 25th - 31st March 2023 -- Get your ticket to EthCC">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://raffle.ethcc.io/">
+    <meta property="og:title" content="EthCC[6] Auction & Raffle">
+    <meta property="og:description" content="EthCC[6] Auction / Raffle -- 25th - 31st March 2023 -- Get your ticket to EthCC">
+    <meta property="og:image" content=""> <!-- TODO: put proper image in place! -->
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://raffle.ethcc.io/">
+    <meta property="twitter:title" content="EthCC[6] Auction & Raffle">
+    <meta property="twitter:description" content="EthCC[6] Auction / Raffle -- 25th - 31st March 2023 -- Get your ticket to EthCC">
+    <meta property="twitter:image" content=""> <!-- TODO: put proper image in place! -->
   </head>
   <body>
     <div id="root"></div>
+    <script type="module">
+      import process from "process";
+      import EventEmitter from "events";
+      import {Buffer} from "buffer";
+      window.Buffer = Buffer;
+      window.process = process;
+      window.EventEmitter = EventEmitter;
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

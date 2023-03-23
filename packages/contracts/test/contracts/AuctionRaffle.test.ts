@@ -8,13 +8,13 @@ import {
   minBidIncrement,
   reservePrice,
 } from 'fixtures/auctionRaffleFixture'
-import { merkleTreeFixture, hashDiscount } from 'fixtures/merkleTreeFixture'
+import { hashDiscount } from 'fixtures/merkleTreeFixture'
 import { AuctionRaffleMock, ExampleToken } from 'contracts'
 import { getLatestBlockTimestamp } from 'utils/getLatestBlockTimestamp'
 import { Provider } from '@ethersproject/providers'
 import { Zero } from '@ethersproject/constants'
 import { HOUR, MINUTE } from 'scripts/utils/consts'
-import { network } from 'hardhat'
+import { network, ethers } from 'hardhat'
 import { setPrevRandao } from "@nomicfoundation/hardhat-network-helpers";
 import { BigNumber, BigNumberish, ContractTransaction, Wallet } from 'ethers'
 import { State } from './state'
@@ -34,7 +34,7 @@ describe('AuctionRaffle', function () {
   let auctionRaffleAsOwner: AuctionRaffleMock
   let bidderAddress: string
   let wallets: Wallet[]
-  let discountTree: MerkleTree 
+  let discountTree: MerkleTree
   let discounts
   let bidderProof: string[]
 
@@ -44,6 +44,68 @@ describe('AuctionRaffle', function () {
     bidderAddress = await auctionRaffle.signer.getAddress()
     bidderProof = discountTree.getHexProof(hashDiscount(bidderAddress, discounts[0]))
   })
+
+  it.skip('should handle the load with 500 participants (TAKES A LONG TIME)', async function () {
+    this.timeout(500000);
+
+    ({ provider, auctionRaffle, wallets, discountTree, discounts } = await loadFixture(configuredAuctionRaffleFixture({
+      reservePrice: ethers.utils.parseEther('0.000000001'),
+      minBidIncrement: ethers.utils.parseEther('0.00000001'),
+      auctionWinnersCount: 20,
+      raffleWinnersCount: 280,
+    })))
+    const reservePrice = ethers.utils.parseEther('0.000000001')
+    const minBid = ethers.utils.parseEther('0.00000001')
+    auctionRaffleAsOwner = auctionRaffle.connect(owner())
+    bidderAddress = await auctionRaffle.signer.getAddress()
+    bidderProof = discountTree.getHexProof(hashDiscount(bidderAddress, discounts[0]))
+
+    const mnemonic = 'lucky elephant lunch topic believe snap either ankle group orbit meadow genuine'
+    const path = (i) =>  `m/44'/60'/0'/0/${i.toString(10)}`
+    const hdWallet = ethers.utils.HDNode.fromMnemonic(mnemonic)
+    const n = 10000
+
+    const bidderWallets = new Array(n).fill(0).map(function (_, i) {
+      const node = hdWallet.derivePath(path(i))
+      return new ethers.Wallet(node.privateKey, provider)
+    })
+
+    for (let i = 0; i < n; i++) {
+      if (i > 0 && i % 100 === 0) console.log('fund', i)
+
+      await wallets[0].sendTransaction({
+        to: bidderWallets[i].address,
+        value: ethers.utils.parseEther('0.01')
+      })
+    }
+
+    const chunkSize = 50;
+    const array = bidderWallets
+    for (let i = 0; i < array.length; i += chunkSize) {
+      console.log('bid', i)
+      const chunk = array.slice(i, i + chunkSize);
+      await Promise.all(chunk.map(async function (bidder, j) {
+        const v = reservePrice.add(minBid.mul(BigNumber.from(j)))
+        try {
+          await auctionRaffle.connect(bidder).bid({ gasLimit: 1_000_000, value: v })
+        } catch (err) {
+          console.error(i, err)
+        }
+      }))
+    }
+
+    console.log('endBidding')
+
+    await endBidding(auctionRaffle)
+
+    console.log('settleAuction')
+    await auctionRaffleAsOwner.settleAuction()
+    console.log('settleRaffle')
+    await auctionRaffleAsOwner.settleRaffle()
+
+    const tx = await auctionRaffleAsOwner.claimProceeds()
+    const receipt = await tx.wait()
+  });
 
   describe('bidWithDiscount', function () {
     it('should revert if proof is invalid', async function () {

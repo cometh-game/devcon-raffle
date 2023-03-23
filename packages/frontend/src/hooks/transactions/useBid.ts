@@ -1,5 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { useEthers, useSendTransaction } from '@usedapp/core'
+import proofs from 'src/assets/merkle-tree.json'
 import { useDevconContract } from 'src/hooks/contract'
 
 export function useBid() {
@@ -12,7 +13,20 @@ export function useBid() {
       return
     }
 
-    const tx = await devcon.populateTransaction.bid({ value: bidAmount })
+    // check if user is eligible for a discount
+    const userDiscount = proofs.find((p) => p.address === account.toLowerCase())
+    const discountPercentage = userDiscount?.discountPercentage ?? 0
+    const proof = userDiscount?.proof ?? []
+
+    console.log('User', account)
+    console.log('Discount percentage', discountPercentage)
+    console.log('Proof', proof)
+
+    const tx =
+      discountPercentage === undefined || discountPercentage === 0
+        ? await devcon.populateTransaction.bid({ value: bidAmount })
+        : await devcon.populateTransaction.bidWithDiscount(discountPercentage, proof, { value: bidAmount })
+
     await sendTransaction(tx)
   }
 

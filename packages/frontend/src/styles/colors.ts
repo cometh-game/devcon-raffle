@@ -1,7 +1,7 @@
 export const Colors = {
   White: '#FFFFFF',
   Black: '#323232',
-  Blue: '#1144AA',
+  Blue: '#2800A5',
   BlueDark: '#103D96',
   BlueLight: '#F6FFFE',
   Green: '#BDE9E4',
@@ -13,6 +13,7 @@ export const Colors = {
   Red: '#FFA5A5',
   RedDark: '#FF6666',
   RedLight: '#FFF7F7',
+  Violet: '#DF00A6',
   Transparent: 'transparent',
 }
 

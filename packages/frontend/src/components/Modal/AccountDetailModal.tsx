@@ -1,14 +1,14 @@
 import Jazzicon from '@metamask/jazzicon'
 import { shortenAddress, useEthers } from '@usedapp/core'
+import { useConnectWallet } from '@web3-onboard/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CopyButton, RedirectButton } from 'src/components/Buttons'
 import { Button } from 'src/components/Buttons/Button'
 import { ContentRow, Modal } from 'src/components/Modal/Modal'
-import { useWeb3Modal, useWhichWallet } from 'src/hooks'
+import { useLogout } from 'src/hooks/backend/useLogout'
 import { useChainId } from 'src/hooks/chainId/useChainId'
 import { Colors } from 'src/styles/colors'
 import { getExplorerAddressLink } from 'src/utils/getExplorerLink'
-import { getWalletName } from 'src/utils/getWalletName'
 import { removeWalletLinkStorage } from 'src/utils/removeWalletLinkStorage'
 import styled from 'styled-components'
 
@@ -19,14 +19,15 @@ export interface ModalProps {
 
 export const AccountDetailModal = ({ isShown, onRequestClose }: ModalProps) => {
   const { account, deactivate } = useEthers()
-  const web3Modal = useWeb3Modal()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [{ wallet }, connect, disconnect] = useConnectWallet()
   const accountIconRef = useRef<any>(null)
   const chainId = useChainId()
-  const [wallet, setWallet] = useState('-')
-  const { isBraveWallet } = useWhichWallet()
+  const [walletLabel, setWalletLabel] = useState('-')
+  const { logout } = useLogout()
 
   useEffect(() => {
-    setWallet(getWalletName(web3Modal.cachedProvider, isBraveWallet))
+    setWalletLabel(wallet?.label ?? '-')
     if (account && accountIconRef.current) {
       accountIconRef.current.innerHTML = ''
       accountIconRef.current.appendChild(Jazzicon(40, parseInt(account.slice(2, 10), 16)))
@@ -36,17 +37,21 @@ export const AccountDetailModal = ({ isShown, onRequestClose }: ModalProps) => {
 
   const onDisconnect = useCallback(() => {
     onRequestClose()
+    if (wallet?.label) {
+      disconnect(wallet)
+    }
+    localStorage.removeItem('selectedWallet')
     localStorage.removeItem('walletconnect')
     removeWalletLinkStorage()
-    web3Modal.clearCachedProvider()
     deactivate()
-  }, [onRequestClose, deactivate, web3Modal])
+    logout()
+  }, [onRequestClose, wallet, disconnect, deactivate, logout])
 
   return (
     <Modal isShown={isShown} onRequestClose={onRequestClose} title="Your account">
       <ContentWrapper>
         <ContentRow>
-          <ConnectedWallet>Connected with {wallet}</ConnectedWallet>
+          <ConnectedWallet>Connected with {walletLabel}</ConnectedWallet>
         </ContentRow>
         <ContentRow>
           <AccountIcon ref={accountIconRef} />
@@ -89,7 +94,7 @@ const AccountIcon = styled.div`
 `
 
 const AccountAddress = styled.p`
-  font-family: 'Space Mono', 'Roboto Mono', monospace;
+  font-family: 'Jetbrains Mono', 'Space Mono', 'Roboto Mono', monospace;
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;

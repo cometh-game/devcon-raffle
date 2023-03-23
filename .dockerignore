@@ -1,0 +1,13 @@
+Dockerfile
+.dockerignore
+.husky
+.vscode
+README.md
+yarn-error.log
+.drone.yml
+.env.example
+.eslintrc
+.gitignore
+.nvmrc
+.prettierrc
+node_modules/

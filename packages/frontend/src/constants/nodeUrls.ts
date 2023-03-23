@@ -3,9 +3,8 @@ import { ChainId } from '@usedapp/core'
 import { SupportedChainId } from 'src/constants/chainIDs'
 
 const NODE_URLS: Record<SupportedChainId, string> = {
-  [ChainId.Arbitrum]: 'https://arb-mainnet.g.alchemy.com/v2/6-V_6Ad9eh8xGo3U7hbfFsveRdC67dQL',
-  [ChainId.ArbitrumRinkeby]: 'https://rinkeby.arbitrum.io/rpc',
-  [ChainId.Mumbai]: 'https://rpc.ankr.com/polygon_mumbai',
+  [ChainId.Mainnet]: 'https://eth.llamarpc.com',
+  [ChainId.Goerli]: 'https://goerli.blockpi.network/v1/rpc/public', //'https://rpc.ankr.com/eth_goerli',
   [ChainId.Hardhat]: 'http://localhost:8545',
 }
 

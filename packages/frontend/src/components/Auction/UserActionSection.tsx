@@ -55,4 +55,15 @@ const Wrapper = styled.div`
   background-color: ${Colors.Blue};
   position: relative;
   z-index: 1;
+
+  @media only screen and (max-width: 800px) {
+    width: 100%;
+    height: auto;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-left: 0;
+    margin-right: 0;
+  }
 `

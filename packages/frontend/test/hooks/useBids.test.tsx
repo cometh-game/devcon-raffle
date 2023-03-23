@@ -1,6 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber'
+import { Zero } from '@ethersproject/constants'
 import { parseEther } from '@ethersproject/units'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, WrapperComponent } from '@testing-library/react-hooks'
 import { useBids } from 'src/hooks/useBids'
 import { Bid } from 'src/models/Bid'
 import { BidsProvider } from 'src/providers/Bids/provider'
@@ -37,7 +38,7 @@ jest.mock('src/hooks/contract/useReadOnlyProvider', () => ({
 describe('useBids', () => {
   const render = () => {
     const { result } = renderHook(() => useBids(), {
-      wrapper: ({ children }) => <BidsProvider>{children}</BidsProvider>,
+      wrapper: (({ children }) => <BidsProvider>{children}</BidsProvider>) as WrapperComponent<unknown>,
     })
     return {
       bids: result.current.bids.toArray().map((bid) => bid.toObject()),
@@ -142,6 +143,7 @@ describe('useBids', () => {
     return {
       bidderID: BigNumber.from(bidderID),
       amount: parseEther(amount),
+      discount: Zero,
       bidderAddress: mockBidsAddresses[bidderID - 1],
       place: -1,
     }

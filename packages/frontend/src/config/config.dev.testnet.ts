@@ -1,4 +1,4 @@
-import { Mumbai } from '@usedapp/core'
+import { Goerli } from '@usedapp/core'
 import { providerWithInterval } from 'src/constants/nodeUrls'
 import { POLLING_INTERVAL } from 'src/constants/pollingInterval'
 
@@ -10,15 +10,15 @@ export function getTestnetDevConfig(): Config {
   return {
     useDAppConfig: {
       ...commonUseDAppConfig,
-      readOnlyChainId: Mumbai.chainId,
-      readOnlyUrls: providerWithInterval(Mumbai.chainId, POLLING_INTERVAL),
-      networks: [Mumbai],
+      readOnlyChainId: Goerli.chainId,
+      readOnlyUrls: providerWithInterval(Goerli.chainId, POLLING_INTERVAL),
+      networks: [{ ...Goerli, rpcUrl: 'https://goerli.blockpi.network/v1/rpc/public' }],
       pollingInterval: POLLING_INTERVAL,
     },
     addresses: getAddresses(),
-    backendUrl: getStringEnv('VITE_BACKEND_URL') || 'http://localhost:3001',
+    backendUrl: getStringEnv('VITE_BACKEND_URL') || 'https://ethcc.develop.alembic.tech/api',
     portisDAppID: getStringEnv('VITE_PORTIS_DAPP_ID') || '',
-    dappName: 'EthCC 6 Auction & Raffle (TESTNET DEV)',
+    dappName: 'EthCC[6] Auction & Raffle (TESTNET DEV)',
     voucherRedeemDeadline: getDateEnv('VITE_VOUCHER_REDEEM_DEADLINE'),
   }
 }

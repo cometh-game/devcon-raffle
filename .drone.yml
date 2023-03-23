@@ -2,33 +2,61 @@ kind: pipeline
 type: docker
 name: develop push
 steps:
+    - name: restore-cache
+      image: meltwater/drone-cache
+      environment:
+          PLUGIN_JSON_KEY:
+              from_secret: google_credentials
+      settings:
+          backend: gcs
+          cache_key: '{{ .Repo.Name }}_{{ checksum "yarn.lock" }}'
+          restore: true
+          archive_format: "zstd"
+          bucket: cometh-drone-cache-bucket
+          mount:
+              - "node_modules"
     - name: compile
       image: node:16
       commands:
           - yarn install
           - yarn build --mode development
       environment:
-          VITE_NETWORK: 'Mumbai'
-
+          VITE_NETWORK: "Goerli"
+      depends_on: [restore-cache]
+    - name: rebuild-cache
+      image: meltwater/drone-cache
+      environment:
+          PLUGIN_JSON_KEY:
+              from_secret: google_credentials
+      settings:
+          backend: gcs
+          cache_key: '{{ .Repo.Name }}_{{ checksum "yarn.lock" }}'
+          rebuild: true
+          archive_format: "zstd"
+          bucket: cometh-drone-cache-bucket
+          mount:
+              - "node_modules"
+      depends_on: [compile]
     - name: build and push
       image: plugins/gcr
       settings:
           dockerfile: Dockerfile
           registry: gcr.io/infra-342714
-          repo: devcon-raffle
+          repo: ${DRONE_REPO_NAME}
+          cache_from: gcr.io/infra-342714/${DRONE_REPO_NAME}:develop
           tags:
               - develop
           json_key:
               from_secret: google_credentials
-
+      depends_on: [compile]
     - name: rolling update
       image: gcr.io/infra-342714/app-rolling-update:latest
       environment:
           GCP_SA:
               from_secret: google_credentials
-          SERVICE: devcon-raffle
+          SERVICE: ${DRONE_REPO_NAME}
           ENVIRONMENT: develop
-
+      depends_on: [build and push]
     - name: discord notification
       image: appleboy/drone-discord
       settings:
@@ -47,11 +75,97 @@ steps:
               {{/success}}
       when:
           status: [success, failure]
+      depends_on: [build and push]
 trigger:
-    branch: 
+    branch:
         - develop
     event:
         - push
-
+image_pull_secrets:
+    - dockerconfigjson
+---
+kind: pipeline
+type: docker
+name: prod push
+steps:
+    - name: restore-cache
+      image: meltwater/drone-cache
+      environment:
+          PLUGIN_JSON_KEY:
+              from_secret: google_credentials
+      settings:
+          backend: gcs
+          cache_key: '{{ .Repo.Name }}_{{ checksum "yarn.lock" }}'
+          restore: true
+          archive_format: "zstd"
+          bucket: cometh-drone-cache-bucket
+          mount:
+              - "node_modules"
+    - name: compile
+      image: node:16
+      commands:
+          - yarn install
+          - yarn build
+      environment:
+          VITE_NETWORK: "Goerli"
+      depends_on: [restore-cache]
+    - name: rebuild-cache
+      image: meltwater/drone-cache
+      environment:
+          PLUGIN_JSON_KEY:
+              from_secret: google_credentials
+      settings:
+          backend: gcs
+          cache_key: '{{ .Repo.Name }}_{{ checksum "yarn.lock" }}'
+          rebuild: true
+          archive_format: "zstd"
+          bucket: cometh-drone-cache-bucket
+          mount:
+              - "node_modules"
+      depends_on: [compile]
+    - name: build and push
+      image: plugins/gcr
+      settings:
+          dockerfile: Dockerfile
+          registry: gcr.io/infra-342714
+          repo: ${DRONE_REPO_NAME}
+          cache_from: gcr.io/infra-342714/${DRONE_REPO_NAME}:develop
+          tags:
+              - prod
+          json_key:
+              from_secret: google_credentials
+      depends_on: [compile]
+    - name: rolling update
+      image: gcr.io/infra-342714/app-rolling-update:latest
+      environment:
+          GCP_SA:
+              from_secret: google_credentials
+          SERVICE: ${DRONE_REPO_NAME}
+          ENVIRONMENT: prod
+      depends_on: [build and push]
+    - name: discord notification
+      image: appleboy/drone-discord
+      settings:
+          webhook_id:
+              from_secret: discord_webhook_id
+          webhook_token:
+              from_secret: discord_webhook_token
+          username: drone
+          message: >
+              {{#success build.status}}
+                build push and rolling update for {{repo.name}} succeeded.
+                {{build.link}}
+              {{else}}
+                 build push and rolling update for {{repo.name}} failed. Fix me please.
+                {{build.link}}
+              {{/success}}
+      when:
+          status: [success, failure]
+      depends_on: [build and push]
+trigger:
+    branch:
+        - master
+    event:
+        - push
 image_pull_secrets:
     - dockerconfigjson

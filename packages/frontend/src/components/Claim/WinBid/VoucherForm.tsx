@@ -5,7 +5,7 @@ import { useVoucherRedeemDeadline } from 'src/hooks/useVoucherRedeemDeadline'
 import { Colors } from 'src/styles/colors'
 import styled from 'styled-components'
 
-import { VoucherTimeLeft } from './VoucherTimeLeft'
+import { ClaimTicketTimeLeft } from './ClaimTicketTimeLeft'
 import { WinnerForm } from './WinBidForm'
 
 interface Props {
@@ -40,7 +40,7 @@ export const VoucherForm = ({ voucher, withdrawnBid }: Props) => {
       >
         Go to sales system
       </Button>
-      {!isVoucherExpired && <VoucherTimeLeft />}
+      {!isVoucherExpired && <ClaimTicketTimeLeft />}
     </WinnerForm>
   )
 }

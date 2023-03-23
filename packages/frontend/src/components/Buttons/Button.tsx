@@ -56,7 +56,8 @@ const PrimaryButtonStyles = css<ButtonProps>`
   ${commonButtonStyles}
 
   background-color: ${Colors.GreenLight};
-  color: ${Colors.Black};
+  color: ${Colors.Blue};
+  font-weight: 500;
 
   &:hover,
   &:focus-visible {

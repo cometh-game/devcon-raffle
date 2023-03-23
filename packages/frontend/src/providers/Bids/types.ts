@@ -16,6 +16,7 @@ export const bidFactory = ImmutableRecord<Bid>({
   bidderID: Zero,
   bidderAddress: AddressZero,
   amount: Zero,
+  discount: Zero,
   place: 0,
 })
 

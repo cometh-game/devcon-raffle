@@ -10,7 +10,7 @@ import { fundAccounts } from 'scripts/utils/fundAccounts'
 import { bidAsSigner } from 'scripts/utils/bid'
 import { minBidIncrement, reservePrice } from 'scripts/node/deploy'
 
-const auctionRaffleAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+const auctionRaffleAddress = '0x783D14DEC137B4b477CdD225c4033942DCC9f6c9'
 
 task('bid', 'Places bid for given account with provided amount')
   .addParam('account', 'Hardhat account to use')
@@ -55,7 +55,7 @@ task('settle-auction', 'Settles auction')
   .setAction(async (taskArgs, hre) => {
     const auctionRaffle = await auctionRaffleAsOwner(hre)
 
-    await auctionRaffle.settleAuction()
+    await auctionRaffle.settleAuction({ gasLimit: 300_000 })
     console.log('Auction settled!')
   })
 
@@ -63,11 +63,18 @@ task('settle-raffle', 'Settles raffle')
   .setAction(async (taskArgs, hre) => {
     const auctionRaffle = await auctionRaffleAsOwner(hre)
 
-    const raffleWinnersCount = await auctionRaffle.raffleWinnersCount()
-    const randomNumbersCount = BigNumber.from(raffleWinnersCount).div(8).toNumber()
+    //const raffleWinnersCount = await auctionRaffle.raffleWinnersCount()
+    //const randomNumbersCount = BigNumber.from(raffleWinnersCount).div(8).toNumber()
 
-    await auctionRaffle.settleRaffle(randomBigNumbers(randomNumbersCount))
+    await auctionRaffle.settleRaffle(/*randomBigNumbers(randomNumbersCount)*/)
     console.log('Raffle settled!')
+  })
+
+task('withdraw-unclaimed', 'Withdraw unclaimed funds')
+  .setAction(async (taskArgs, hre) => {
+    const auctionRaffle = await auctionRaffleAsOwner(hre)
+    await auctionRaffle.withdrawUnclaimedFunds()
+    console.log('Withdrew unclaimed funds!')
   })
 
 function logBid(address: string, bidAmount: BigNumberish) {

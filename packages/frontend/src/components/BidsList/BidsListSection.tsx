@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BidsList, BidsListHeaders } from 'src/components/BidsList'
 import { Button } from 'src/components/Buttons'
+import { TimeLeft } from 'src/components/Info/TimeLeft'
 import { useAuctionState } from 'src/hooks'
 import { useAuctionWinnersCount } from 'src/hooks/useAuctionWinnersCount'
 import { useBids } from 'src/hooks/useBids'
@@ -38,6 +39,9 @@ export const BidsListSection = () => {
         </EmptyList>
       ) : (
         <>
+          <TimeLeftWrapper>
+            <TimeLeft />
+          </TimeLeftWrapper>
           <ListHeader>
             <h3>Number of participants:</h3>
             <ColoredText>{isLoadingParams ? 0 : immutableBids.size}</ColoredText>
@@ -92,6 +96,10 @@ const BidsListContainer = styled.div`
   row-gap: 32px;
   width: 100%;
   padding: 46px 0;
+`
+
+const TimeLeftWrapper = styled.div`
+  color: ${Colors.Blue};
 `
 
 const ListHeader = styled.div`

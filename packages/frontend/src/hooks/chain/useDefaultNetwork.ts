@@ -3,7 +3,6 @@ import { CONFIG } from 'src/config/config'
 
 export function useDefaultNetwork(): Chain {
   const defaultNetwork = CONFIG.useDAppConfig.networks?.[0]
-  console.warn('defaultNetwork', defaultNetwork)
 
   if (defaultNetwork === undefined) {
     throw new Error('no default network set in useDApp config')

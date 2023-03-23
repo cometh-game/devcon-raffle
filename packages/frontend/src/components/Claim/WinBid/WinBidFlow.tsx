@@ -50,7 +50,7 @@ function calculateWithdrawalAmount(userBid: UserBid, minimumBid: BigNumber) {
     case WinType.GoldenTicket:
       return userBid.amount
     case WinType.Raffle:
-      return userBid.amount.sub(minimumBid)
+      return userBid.amount.sub(minimumBid.sub(userBid.discount))
     default:
       return userBid.amount.mul(98).div(100)
   }

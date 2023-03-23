@@ -5,6 +5,7 @@ export interface Bid {
   bidderID: BigNumber
   bidderAddress: string
   amount: BigNumber
+  discount: BigNumber
   place: number
 }
 

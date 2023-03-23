@@ -2,13 +2,18 @@ import { createGlobalStyle } from 'styled-components'
 
 import { Colors } from './colors'
 import { fonts } from './fonts'
-import { web3Modal, web3ModalInstallMetaMaskFlexOrder } from './web3modal'
 
 export const GlobalStyles = createGlobalStyle`
   ${fonts}
 
   *, *:before, *:after {
     box-sizing: border-box;
+  }
+
+  @media only screen and (max-width: 800px) {
+    *, *:before, *:after {
+      font-size:calc(12px + 1.5vw);
+    }
   }
 
   html, body {
@@ -42,7 +47,7 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   h1, h2, h3, h4 {
-    font-family: 'Space Mono', 'Roboto Mono', monospace;
+    font-family: 'Jetbrains Mono', 'Space Mono', monospace;
     font-style: normal;
     margin: 0;
   }
@@ -106,8 +111,4 @@ export const GlobalStyles = createGlobalStyle`
   body::-webkit-scrollbar-track {
     background: ${Colors.Transparent};
   }
-
-  ${web3Modal}
-
-  ${window.ethereum === undefined ? web3ModalInstallMetaMaskFlexOrder : ''}
 `

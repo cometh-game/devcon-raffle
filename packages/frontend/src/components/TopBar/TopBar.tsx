@@ -24,6 +24,10 @@ const TopBarContainer = styled.div`
   position: sticky;
   top: 0;
   z-index: 99;
+
+  @media only screen and (max-width: 900px) {
+    padding: 8px 16px;
+  }
 `
 const HomeLink = styled.a`
   line-height: 1;

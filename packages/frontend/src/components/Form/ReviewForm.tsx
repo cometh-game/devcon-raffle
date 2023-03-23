@@ -73,9 +73,9 @@ export const ReviewForm = ({
           <span>{formatEtherAmount(impact)} ETH</span>
         </FormRow>
       )}
-      <Button view="primary" isLoading={isPending} onClick={sendTransaction}>
+      <ActionButton view="primary" isLoading={isPending} onClick={sendTransaction}>
         {heading[action.type]}
-      </Button>
+      </ActionButton>
       {discount > 0 && (
         <FormRow>
           <Discount>
@@ -89,4 +89,8 @@ export const ReviewForm = ({
 
 const Discount = styled.span`
   opacity: 0.7;
+`
+
+const ActionButton = styled(Button)`
+  width: 100%;
 `

@@ -41,6 +41,15 @@ const StyledHeader = styled(HeaderBar)`
     #ff005f 83.33%,
     #ff0000 100%
   );
+
+  @media only screen and (max-width: 900px) {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+    height: auto;
+  }
 `
 
 const Wrapper = styled.div`

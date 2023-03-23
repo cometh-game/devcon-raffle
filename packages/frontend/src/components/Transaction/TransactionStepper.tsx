@@ -108,6 +108,10 @@ const StepperContainer = styled.div`
   width: 313px;
   padding: 82px 20px 82px 0;
   background-color: ${Colors.BlueDark};
+
+  @media only screen and (max-width: 900px) {
+    width: 100%;
+  }
 `
 const StepperHeader = styled.h3`
   margin: 0 0 24px 24px;
@@ -119,6 +123,10 @@ const StepperList = styled.ul`
   flex-direction: column;
   margin: 0 0 0 -7px;
   padding: 0;
+
+  @media only screen and (max-width: 900px) {
+    margin-left: 16px;
+  }
 `
 
 function getItemColor(props: DisplayTypeProps) {

@@ -77,6 +77,10 @@ export const AuctionTransaction = ({
 const Transaction = styled.div`
   display: flex;
   width: 100%;
+
+  @media only screen and (max-width: 900px) {
+    display: block;
+  }
 `
 
 const TransactionWrapper = styled(FormWrapper)`
@@ -84,6 +88,11 @@ const TransactionWrapper = styled(FormWrapper)`
   row-gap: 24px;
   padding: 82px 54px;
   width: fit-content;
+
+  @media only screen and (max-width: 900px) {
+    padding: 16px;
+    width: 100%;
+  }
 `
 const TransactionHeading = styled.div`
   display: flex;

@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 export const Auction = () => {
   return (
-    <Wrapper>
+    <Wrapper id="wrapper">
       <UserActionSection />
       <BidsListSection />
     </Wrapper>
@@ -18,4 +18,10 @@ const Wrapper = styled.div`
   width: 670px;
   padding: 0 115px;
   background: ${Colors.GreyLight};
+
+  @media only screen and (max-width: 900px) {
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 `

@@ -27,7 +27,7 @@ interface TimeProps {
 }
 
 const ClaimTimeBox = styled.div<TimeProps>`
-  width: calc(100% - 54px);
+  //width: calc(100% - 54px);
   padding: 8px 24px 8px 68px;
   background: ${({ isPeriodExpired }) => (isPeriodExpired ? Colors.RedLight : Colors.Blue)};
 `

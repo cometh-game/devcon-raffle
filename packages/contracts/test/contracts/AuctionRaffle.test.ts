@@ -34,7 +34,7 @@ describe('AuctionRaffle', function () {
   let auctionRaffleAsOwner: AuctionRaffleMock
   let bidderAddress: string
   let wallets: Wallet[]
-  let discountTree: MerkleTree 
+  let discountTree: MerkleTree
   let discounts
   let bidderProof: string[]
 
@@ -565,7 +565,7 @@ describe('AuctionRaffle', function () {
         for (let i = 1; i <= 4; i++) {
           const bid = await getBidByID(i)
 
-          if (bid.bidderID.eq(3)) {
+          if (bid.bidderID == 3) {
             expect(bid.winType).to.be.eq(WinType.goldenTicket)
           } else {
             expect(bid.winType).to.be.eq(WinType.raffle)

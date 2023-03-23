@@ -6,6 +6,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
+import "@openzeppelin/contracts/utils/math/SafeCast.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 import "./Config.sol";
 import "./models/BidModel.sol";
@@ -20,12 +23,13 @@ import "hardhat/console.sol";
  * @author TrueFi Engineering team
  */
 contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
+    using Address for address payable;
     using SafeERC20 for IERC20;
     using MaxHeap for uint256[];
 
     mapping(address => Bid) _bids; // bidder address -> Bid
     mapping(uint256 => address payable) _bidders; // bidderID -> bidder address
-    uint256 _nextBidderID = 1;
+    uint32 _biddersCount = 0;
 
     uint256[] _heap;
     uint256 _minKeyIndex;
@@ -105,7 +109,7 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
      * @dev Assigns a unique bidderID to the sender address.
      */
     function bid() external payable onlyExternalTransactions onlyInState(State.BIDDING_OPEN) {
-      makeBid();
+        _makeBid(msg.sender, msg.value, 0);
     }
 
     /***
@@ -116,52 +120,63 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
      * If msg.sender makes multiple bids, the highest discount is kept.
      */
     function bidWithDiscount(
-      uint256 discountPercentage,
-      bytes32[] memory proof
+        uint256 discountPercentage,
+        bytes32[] memory proof
     ) external payable onlyExternalTransactions onlyInState(State.BIDDING_OPEN) {
-      require(discountPercentage <= 100, "AuctionRaffle: discount must be at most 100%");
+        require(discountPercentage <= 100, "AuctionRaffle: discount must be at most 100%");
 
-      bytes32 leaf = keccak256(abi.encode(msg.sender, discountPercentage));
-      require(
-        MerkleProof.verify(proof, discountRoot, leaf),
-        "AuctionRaffle: discount proof invalid"
-      );
-      makeBid();
-
-      // after making a bid, bidder exists for `msg.sender`
-      Bid storage bidder = _bids[msg.sender];
-      uint256 oldDiscount = bidder.discount;
-
-      uint256 reservePrice = _reservePrice;
-      uint256 discount = (reservePrice * discountPercentage) / 100;
-
-      if (discount > oldDiscount) {
-        bidder.discount = discount;
-      }
+        bytes32 leaf = keccak256(abi.encode(msg.sender, discountPercentage));
+        require(
+            MerkleProof.verify(proof, discountRoot, leaf),
+            "AuctionRaffle: discount proof invalid"
+        );
+        _makeBid(
+            msg.sender,
+            msg.value,
+            _reservePrice * discountPercentage / 100
+        );
     }
 
     /***
      * @notice Places a new bid or bumps an existing bid.
      * @dev Assigns a unique bidderID to the sender address.
      */
-    function makeBid() private {
-        Bid storage bidder = _bids[msg.sender];
-        if (bidder.amount == 0) {
-            require(msg.value >= _reservePrice, "AuctionRaffle: bid amount is below reserve price");
-            bidder.amount = msg.value;
-            bidder.bidderID = _nextBidderID++;
-            _bidders[bidder.bidderID] = payable(msg.sender);
-            _raffleParticipants.push(bidder.bidderID);
+    function _makeBid(address sender, uint256 value, uint256 discount) private {
+        // This is a memory cache
+        Bid memory bidder = _bids[sender];
+        uint96 oldAmount = bidder.amount;
+        uint96 newAmount = oldAmount + SafeCast.toUint96(value);
+        uint32 bidderID  = oldAmount > 0 ? bidder.bidderID : ++_biddersCount;
 
-            addBidToHeap(bidder.bidderID, bidder.amount);
+        if (oldAmount == 0) {
+            require(value >= _reservePrice, "AuctionRaffle: bid amount is below reserve price");
+
+            _bids[sender] = Bid({
+                bidderID: bidderID,
+                amount: newAmount,
+                discount: SafeCast.toUint96(discount),
+                winType: WinType.LOSS,
+                claimed: false
+            });
+
+            _bidders[bidderID] = payable(sender);
+            _raffleParticipants.push(bidderID);
+
+            addBidToHeap(bidderID, newAmount);
         } else {
-            require(msg.value >= _minBidIncrement, "AuctionRaffle: bid increment too low");
-            uint256 oldAmount = bidder.amount;
-            bidder.amount += msg.value;
+            require(value >= _minBidIncrement, "AuctionRaffle: bid increment too low");
 
-            updateHeapBid(bidder.bidderID, oldAmount, bidder.amount);
+            // update amount
+            _bids[sender].amount = newAmount;
+
+            // update discount
+            if (bidder.discount < discount) {
+              _bids[sender].discount = SafeCast.toUint96(discount);
+            }
+
+            updateHeapBid(bidderID, oldAmount, newAmount);
         }
-        emit NewBid(msg.sender, bidder.bidderID, bidder.amount);
+        emit NewBid(sender, bidderID, newAmount);
     }
 
     /**
@@ -174,16 +189,14 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
     function settleAuction() external onlyOwner onlyInState(State.BIDDING_CLOSED) {
         _settleState = SettleState.AUCTION_SETTLED;
         uint256 biddersCount = getBiddersCount();
-        uint256 raffleWinnersCount = _raffleWinnersCount;
-        if (biddersCount <= raffleWinnersCount) {
+        if (biddersCount <= _raffleWinnersCount) {
             return;
         }
 
-        uint256 auctionParticipantsCount = biddersCount - raffleWinnersCount;
-        uint256 winnersLength = _auctionWinnersCount;
-        if (auctionParticipantsCount < winnersLength) {
-            winnersLength = auctionParticipantsCount;
-        }
+        uint256 winnersLength = Math.min(
+          biddersCount - _raffleWinnersCount,
+          _auctionWinnersCount
+        );
 
         for (uint256 i = 0; i < winnersLength; ++i) {
             uint256 key = _heap.removeMax();
@@ -216,19 +229,18 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
             return;
         }
 
+        // Updating the compiler to 0.8.18 or above, this should be replace with `block.prevrandao`
         uint256 seed = block.difficulty;
-        uint256 raffleWinnersCount = _raffleWinnersCount;
-        uint256[] memory randomNumbers = new uint256[](raffleWinnersCount / _winnersPerRandom);
-        {
-          uint256 randomNumbersLen = randomNumbers.length;
-          for (uint256 i = 0; i < randomNumbersLen; ++i) {
+        uint256 randomNumbersLen = _raffleWinnersCount / _winnersPerRandom;
+        uint256[] memory randomNumbers = new uint256[](randomNumbersLen);
+
+        for (uint256 i = 0; i < randomNumbersLen; ++i) {
             randomNumbers[i] = uint256(keccak256(abi.encode(seed, i)));
-          }
         }
 
         (participantsLength, randomNumbers[0]) = selectGoldenTicketWinner(participantsLength, randomNumbers[0]);
 
-        if (participantsLength < raffleWinnersCount) {
+        if (participantsLength < _raffleWinnersCount) {
             selectAllRaffleParticipantsAsWinners(participantsLength);
             return;
         }
@@ -245,16 +257,18 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
      */
     function claim(uint256 bidderID) external onlyInState(State.RAFFLE_SETTLED) {
         address payable bidderAddress = getBidderAddress(bidderID);
-        Bid storage bidder = _bids[bidderAddress];
+
+        // Memory cache to avoid multiple sloads
+        Bid memory bidder = _bids[bidderAddress];
         require(!bidder.claimed, "AuctionRaffle: funds have already been claimed");
         require(bidder.winType != WinType.AUCTION, "AuctionRaffle: auction winners cannot claim funds");
+        _bids[bidderAddress].claimed = true;
 
-        bidder.claimed = true;
         uint256 claimAmount;
         if (bidder.winType == WinType.RAFFLE) {
             // discount = 0 if no discount to apply
             // discount = a % of _reservePrice so subtracting is safe
-            claimAmount = bidder.amount - (_reservePrice - bidder.discount);
+            claimAmount = bidder.amount + bidder.discount- _reservePrice;
         } else if (bidder.winType == WinType.GOLDEN_TICKET) {
             claimAmount = bidder.amount;
         } else if (bidder.winType == WinType.LOSS) {
@@ -262,7 +276,7 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
         }
 
         if (claimAmount > 0) {
-            bidderAddress.transfer(claimAmount);
+            bidderAddress.sendValue(claimAmount);
         }
     }
 
@@ -281,30 +295,23 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
             return;
         }
 
-        uint256 totalAmount = 0;
+        // Minus one is for golden ticket holder ?
+        uint256 raffleWinnersCount = Math.min(_raffleWinnersCount, biddersCount) - 1;
+
+        // Reserve price of all winner
+        uint256 totalAmount = raffleWinnersCount * _reservePrice;
 
         uint256 auctionWinnersCount = _auctionWinners.length;
         for (uint256 i = 0; i < auctionWinnersCount; ++i) {
-            address bidderAddress = _bidders[_auctionWinners[i]];
-            totalAmount += _bids[bidderAddress].amount;
+            totalAmount += _bids[_bidders[_auctionWinners[i]]].amount;
         }
 
         // becausse there could be discounts applied on raffle winners, we need to subtract discounts
-        uint256 raffleWinnersCount = _raffleWinnersCount - 1;
-        if (biddersCount <= raffleWinnersCount) {
-            raffleWinnersCount = biddersCount - 1;
-        }
-
-        totalAmount += raffleWinnersCount * _reservePrice;
-
-        uint256 discounts = 0;
         for (uint256 i = 0; i < raffleWinnersCount; ++i) {
-            address bidderAddress = _bidders[_raffleWinners[i]];
-            discounts += _bids[bidderAddress].discount;
+            totalAmount -= _bids[_bidders[_raffleWinners[i]]].discount;
         }
 
-        totalAmount -= discounts;
-        payable(owner()).transfer(totalAmount);
+        payable(owner()).sendValue(totalAmount);
     }
 
     /**
@@ -319,12 +326,8 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
         require(feesCount > 0, "AuctionRaffle: there are no fees to claim");
         require(claimedFeesIndex < feesCount, "AuctionRaffle: fees have already been claimed");
 
-        uint256 endIndex = claimedFeesIndex + bidsCount;
-        if (endIndex > feesCount) {
-            endIndex = feesCount;
-        }
-
         uint256 fee = 0;
+        uint256 endIndex = Math.min(claimedFeesIndex + bidsCount, feesCount);
         for (uint256 i = claimedFeesIndex; i < endIndex; ++i) {
             address bidderAddress = getBidderAddress(_raffleParticipants[i]);
             uint256 bidAmount = _bids[bidderAddress].amount;
@@ -332,7 +335,7 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
         }
 
         _claimedFeesIndex = endIndex;
-        payable(owner()).transfer(fee);
+        payable(owner()).sendValue(fee);
     }
 
     /**
@@ -340,8 +343,7 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
      * Callable only after the claiming window is closed.
      */
     function withdrawUnclaimedFunds() external onlyOwner onlyInState(State.CLAIMING_CLOSED) {
-        uint256 unclaimedFunds = address(this).balance;
-        payable(owner()).transfer(unclaimedFunds);
+        payable(owner()).sendValue(address(this).balance);
     }
 
     /**
@@ -411,7 +413,7 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
     }
 
     function getBiddersCount() public view returns (uint256) {
-        return _nextBidderID - 1;
+        return _biddersCount;
     }
 
     function getState() public view returns (State) {
@@ -440,7 +442,7 @@ contract AuctionRaffle is Ownable, Config, BidModel, StateModel {
      * @param amount The bid amount
      */
     function addBidToHeap(uint256 bidderID, uint256 amount) private {
-        bool isHeapFull = getBiddersCount() > _auctionWinnersCount; // bid() already incremented _nextBidderID
+        bool isHeapFull = getBiddersCount() > _auctionWinnersCount; // bid() already incremented _biddersCount
         uint256 key = getKey(bidderID, amount);
         uint256 minKeyValue = _minKeyValue;
 

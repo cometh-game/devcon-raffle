@@ -8,6 +8,7 @@ export const GlobalStyles = createGlobalStyle`
 
   *, *:before, *:after {
     box-sizing: border-box;
+    font-size:calc(12px + 1.5vw);
   }
 
   @media only screen and (max-width: 800px) *, *:before, *:after {

@@ -8,9 +8,9 @@ pragma solidity 0.8.10;
  */
 abstract contract BidModel {
     struct Bid {
-        uint256 bidderID;
-        uint256 amount;
-        uint256 discount;
+        uint32 bidderID;
+        uint96 amount;
+        uint96 discount;
         WinType winType;
         bool claimed;
     }

@@ -41,7 +41,7 @@ steps:
       environment:
           GCP_SA:
               from_secret: google_credentials
-          SERVICE: devcon-raffle-backend
+          SERVICE: ${DRONE_REPO_NAME}
           ENVIRONMENT: develop
       depends_on: [build and push]
     - name: discord notification
@@ -62,6 +62,7 @@ steps:
               {{/success}}
       when:
           status: [success, failure]
+      depends_on: [build and push]
 trigger:
     branch:
         - develop
@@ -125,7 +126,7 @@ steps:
       environment:
           GCP_SA:
               from_secret: google_credentials
-          SERVICE: devcon-raffle-backend
+          SERVICE: ${DRONE_REPO_NAME}
           ENVIRONMENT: prod
       depends_on: [build and push]
     - name: discord notification
@@ -146,6 +147,7 @@ steps:
               {{/success}}
       when:
           status: [success, failure]
+      depends_on: [build and push]
 trigger:
     branch:
         - main

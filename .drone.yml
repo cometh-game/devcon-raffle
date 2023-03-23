@@ -107,7 +107,7 @@ steps:
           - yarn install
           - yarn build
       environment:
-          VITE_NETWORK: "Goerli"
+          VITE_NETWORK: "Mainnet"
       depends_on: [restore-cache]
     - name: rebuild-cache
       image: meltwater/drone-cache

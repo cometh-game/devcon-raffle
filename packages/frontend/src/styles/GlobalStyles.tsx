@@ -10,6 +10,10 @@ export const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
   }
 
+  @media only screen and (max-width: 800px) *, *:before, *:after {
+    font-size:calc(12px + 1.5vw);
+  }
+
   html, body {
     margin: 0;
   }

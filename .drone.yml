@@ -164,7 +164,7 @@ steps:
       depends_on: [build and push]
 trigger:
     branch:
-        - main
+        - master
     event:
         - push
 image_pull_secrets:

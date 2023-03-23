@@ -12,7 +12,7 @@ export const ADDRESSES: Record<string, Record<SupportedChainId, string>> = {
   },
   devcon: {
     [ChainId.Mainnet]: '0x7ed22eCC9744bB15F6B3C2938f56cD06630AF645',
-    [ChainId.Goerli]: '0x7d7B01aE0655A968AB1b1ab3f7A24c10a5CE41A5',
+    [ChainId.Goerli]: '0x5a6F2D4d90498eA8eD7A10395aED1c41D0B637FC',
     [ChainId.Hardhat]: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   },
 }

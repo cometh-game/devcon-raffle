@@ -34,7 +34,7 @@ describe('AuctionRaffle', function () {
   let auctionRaffleAsOwner: AuctionRaffleMock
   let bidderAddress: string
   let wallets: Wallet[]
-  let discountTree: MerkleTree 
+  let discountTree: MerkleTree
   let discounts
   let bidderProof: string[]
 
@@ -44,8 +44,8 @@ describe('AuctionRaffle', function () {
     bidderAddress = await auctionRaffle.signer.getAddress()
     bidderProof = discountTree.getHexProof(hashDiscount(bidderAddress, discounts[0]))
   })
-  
-  it.only('should handle the load with 500 participants (TAKES A LONG TIME)', async function () {
+
+  it.skip('should handle the load with 500 participants (TAKES A LONG TIME)', async function () {
     this.timeout(500000);
 
     ({ provider, auctionRaffle, wallets, discountTree, discounts } = await loadFixture(configuredAuctionRaffleFixture({

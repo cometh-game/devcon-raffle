@@ -45,7 +45,7 @@ describe('AuctionRaffle', function () {
     bidderProof = discountTree.getHexProof(hashDiscount(bidderAddress, discounts[0]))
   })
   
-  it.only('should handle the load with 500 participants (TAKES A LONG TIME)', async function () {
+  it.skip('should handle the load with 500 participants (TAKES A LONG TIME)', async function () {
     this.timeout(500000);
 
     ({ provider, auctionRaffle, wallets, discountTree, discounts } = await loadFixture(configuredAuctionRaffleFixture({

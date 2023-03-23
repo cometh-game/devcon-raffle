@@ -25,6 +25,18 @@ steps:
       depends_on: [restore-cache]
     - name: rebuild-cache
       image: meltwater/drone-cache
+      environment:
+          PLUGIN_JSON_KEY:
+              from_secret: google_credentials
+      settings:
+          backend: gcs
+          cache_key: '{{ .Repo.Name }}_{{ checksum "yarn.lock" }}'
+          rebuild: true
+          archive_format: "zstd"
+          bucket: cometh-drone-cache-bucket
+          mount:
+              - "node_modules"
+      depends_on: [compile]
     - name: build and push
       image: plugins/gcr
       settings:

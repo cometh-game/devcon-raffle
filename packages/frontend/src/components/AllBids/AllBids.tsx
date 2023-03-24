@@ -53,4 +53,9 @@ const PageContainer = styled.div`
   width: 100%;
   max-width: 780px;
   padding: 28px 0 56px;
+
+  @media only screen and (max-width: 900px) {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 `

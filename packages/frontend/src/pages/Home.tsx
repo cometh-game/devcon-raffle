@@ -23,7 +23,7 @@ const PageContainer = styled.div`
   flex: 1;
   width: 100%;
 
-  @media only screen and (max-width: 768px) {
+  @media only screen and (max-width: 900px) {
     display: grid;
     grid-template-columns: 1fr;
     width: 100%;

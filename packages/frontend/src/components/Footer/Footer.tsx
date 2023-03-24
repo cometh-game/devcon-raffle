@@ -34,7 +34,7 @@ const FooterRow = styled.div`
   column-gap: 16px;
   padding: 16px 0 16px 16px;
 
-  @media only screen and (max-width: 800px) {
+  @media only screen and (max-width: 900px) {
     display: grid;
     grid-template-columns: 1fr 1fr;
   }

@@ -37,9 +37,9 @@ export const TransactionSuccess = ({ txHash, action, setView, unlockViewFromTran
           <RedirectButton link={transactionLink} side="top" tooltip="View on Arbiscan" />
         </TransactionIdBox>
       </TransactionIdWrapper>
-      <Button view="primary" onClick={goHome}>
+      <ActionButton view="primary" onClick={goHome}>
         Back to home
-      </Button>
+      </ActionButton>
     </Container>
   )
 }
@@ -71,4 +71,8 @@ const TransactionIdBox = styled.div`
 const TransactionIdText = styled.span`
   flex: 1;
   color: ${Colors.Grey};
+`
+
+const ActionButton = styled(Button)`
+  width: 100%;
 `

@@ -5,6 +5,7 @@ import { Colors } from 'src/styles/colors'
 import { getExplorerAddressLink } from 'src/utils'
 import { formatEtherAmount, shortenEthAddress } from 'src/utils/formatters'
 import styled, { css } from 'styled-components'
+import { useWindowSize } from 'usehooks-ts'
 
 interface Props {
   bid: Bid
@@ -14,6 +15,7 @@ interface Props {
 
 export const BidListEntry = ({ bid, isUser, view = 'full' }: Props) => {
   const chainId = useChainId()
+  const { width } = useWindowSize()
 
   return (
     <BidsEntryRow isUser={isUser}>
@@ -27,7 +29,7 @@ export const BidListEntry = ({ bid, isUser, view = 'full' }: Props) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {view === 'short' ? shortenEthAddress(bid.bidderAddress) : bid.bidderAddress}
+          {view === 'short' || width < 900 ? shortenEthAddress(bid.bidderAddress) : bid.bidderAddress}
         </AddressLink>
       </AddressColumn>
     </BidsEntryRow>

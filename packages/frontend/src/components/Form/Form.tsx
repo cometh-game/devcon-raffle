@@ -7,10 +7,18 @@ export const Form = styled.div`
   row-gap: 16px;
   width: 100%;
   max-width: 460px;
+
+  @media only screen and (max-width: 900px) {
+    max-width: 100%;
+  }
 `
 
 export const FormNarrow = styled(Form)`
   max-width: 289px;
+
+  @media only screen and (max-width: 900px) {
+    max-width: 100%;
+  }
 `
 
 export const FormRow = styled.div`
@@ -36,8 +44,8 @@ export const FormWrapper = styled.div`
   padding: 82px 115px 82px 170px;
   width: 100%;
 
-  @media only screen and (max-width: 800px) {
-    padding: 82px 115px 82px 115px;
+  @media only screen and (max-width: 900px) {
+    padding: 16px 16px 16px 16px;
   }
 `
 

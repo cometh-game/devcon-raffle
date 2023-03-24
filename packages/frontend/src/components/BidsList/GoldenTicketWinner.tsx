@@ -1,7 +1,9 @@
 import { useChainId } from 'src/hooks/chainId/useChainId'
 import { Colors } from 'src/styles/colors'
+import { shortenEthAddress } from 'src/utils/formatters'
 import { getExplorerAddressLink } from 'src/utils/getExplorerLink'
 import styled from 'styled-components'
+import { useWindowSize } from 'usehooks-ts'
 
 interface Props {
   bidderAddress: string | undefined
@@ -9,13 +11,15 @@ interface Props {
 
 export const GoldenTicketWinner = ({ bidderAddress = '-' }: Props) => {
   const chainId = useChainId()
+  const { width } = useWindowSize()
+
   return (
     <Container>
       <ReverseDoot>🎉</ReverseDoot>
       <Section>
         <HeaderText>THE GOLDEN TICKET WINNER IS:</HeaderText>
         <AddressLink href={getExplorerAddressLink(chainId, bidderAddress)} target="_blank" rel="noopener noreferrer">
-          {bidderAddress}
+          {width < 900 ? shortenEthAddress(bidderAddress) : bidderAddress}
         </AddressLink>
       </Section>
       <Doot>🎉</Doot>
@@ -30,6 +34,16 @@ const Container = styled.div`
   width: 100%;
   height: 90px;
   background-color: #4b00ff;
+
+  @media only screen and (max-width: 900px) {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    width: 100%;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    height: auto;
+  }
 `
 
 const Section = styled.div`

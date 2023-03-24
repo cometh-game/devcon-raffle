@@ -19,7 +19,7 @@ const Wrapper = styled.div`
   padding: 0 115px;
   background: ${Colors.GreyLight};
 
-  @media only screen and (max-width: 800px) {
+  @media only screen and (max-width: 900px) {
     width: 100%;
     padding-left: 16px;
     padding-right: 16px;

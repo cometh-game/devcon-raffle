@@ -25,7 +25,7 @@ const TopBarContainer = styled.div`
   top: 0;
   z-index: 99;
 
-  @media only screen and (max-width: 800px) {
+  @media only screen and (max-width: 900px) {
     padding: 8px 16px;
   }
 `

@@ -22,4 +22,8 @@ export const ConnectWalletWarning = () => {
 const ConnectFormWrapper = styled(FormWrapper)`
   justify-content: center;
   padding: 0 218px;
+
+  @media only screen and (max-width: 900px) {
+    padding: 16px;
+  }
 `

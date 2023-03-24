@@ -56,7 +56,7 @@ const Wrapper = styled.div`
   position: relative;
   z-index: 1;
 
-  @media only screen and (max-width: 800px) {
+  @media only screen and (max-width: 900px) {
     width: 100%;
     height: auto;
     padding-top: 32px;

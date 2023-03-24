@@ -89,6 +89,10 @@ export const BumpBidForm = ({
 const BumpFormWrapper = styled(FormWrapper)`
   padding: 0 115px 0 170px;
   justify-content: center;
+
+  @media only screen and (max-width: 900px) {
+    padding: 16px;
+  }
 `
 
 const BumpForm = styled(Form)`

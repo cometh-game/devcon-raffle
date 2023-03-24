@@ -52,7 +52,8 @@ module.exports = {
       accounts: [process.env.DEPLOYER || zeroPrivateKey]
     },
     ethereum: {
-      url: 'https://eth-mainnet.alchemyapi.io/v2/j_dccrP25UjZv5uYxh1mcjEl5o8nWZaf'
+      url: 'https://eth-mainnet.alchemyapi.io/v2/j_dccrP25UjZv5uYxh1mcjEl5o8nWZaf',
+      accounts: [process.env.DEPLOYER || zeroPrivateKey]
     },
     arbitrum: {
       url: `https://arb1.arbitrum.io/rpc`,

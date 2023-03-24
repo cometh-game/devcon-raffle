@@ -6,12 +6,12 @@ import { getStringEnv } from './getEnv'
 
 export const ADDRESSES: Record<string, Record<SupportedChainId, string>> = {
   multicall: {
-    [ChainId.Mainnet]: '0xE3a1C68E8270c36071729e0ad6DDDA25859FE7bb',
+    [ChainId.Mainnet]: '0xf1FB2E1f76dFdDD0Af685377293A8671056BB438',
     [ChainId.Goerli]: '0xE3a1C68E8270c36071729e0ad6DDDA25859FE7bb',
     [ChainId.Hardhat]: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
   },
   devcon: {
-    [ChainId.Mainnet]: '0x7ed22eCC9744bB15F6B3C2938f56cD06630AF645',
+    [ChainId.Mainnet]: '0x5b748663AB0faE4BA7F27cb7b72D182530a16C0e',
     [ChainId.Goerli]: '0x5a6F2D4d90498eA8eD7A10395aED1c41D0B637FC',
     [ChainId.Hardhat]: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   },

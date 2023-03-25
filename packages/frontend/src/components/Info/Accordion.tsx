@@ -160,7 +160,7 @@ export const InfoAccordion = () => {
             <AccordionStyledTrigger heading="In what form will I get the ticket?" />
           </StyledHeader>
           <StyledContent>
-            After the raffle is settled, you will have 4 days (<Bold>until {formatEndDate(redeemTimestamp)}</Bold>) to
+            After the raffle is settled, you will have 7 days (<Bold>until {formatEndDate(redeemTimestamp)}</Bold>) to
             fill in a form presented to you on this page. In order to do so, you will be asked to sign a message using
             your wallet to authenticate as the owner of the winning account. You will then receive your ticket through
             mail!

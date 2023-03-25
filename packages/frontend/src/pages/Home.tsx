@@ -10,10 +10,15 @@ export function Home() {
 
   return (
     <PageContainer id="page-container">
-      { width >= 900 && <Info /> }
-      { width < 900 && <><Header />&nbsp;</> }
+      {width >= 900 && <Info />}
+      {width < 900 && (
+        <>
+          <Header />
+          &nbsp;
+        </>
+      )}
       <Auction />
-      { width < 900 && <InfoAccordion /> }
+      {width < 900 && <InfoAccordion />}
     </PageContainer>
   )
 }

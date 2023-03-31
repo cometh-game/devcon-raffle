@@ -1,6 +1,6 @@
 import { AddressZero } from '@ethersproject/constants'
 import { BaseProvider } from '@ethersproject/providers'
-import { useAsync } from 'react-async-hook'
+import { useMemo, useState } from 'react'
 import { AddressColumn, BidColumn, PlaceColumn } from 'src/components/BidsList/BidsColumns'
 import { useChainId } from 'src/hooks/chainId/useChainId'
 import { useProvider } from 'src/hooks/contract'
@@ -18,26 +18,27 @@ interface Props {
   view?: 'short' | 'full'
 }
 
-const ensNameOrAddress = async (address: string, provider: BaseProvider): Promise<string> => {
-  if (address !== AddressZero) {
-    const ens = await provider.lookupAddress(address)
-    return ens ?? address
-  } else {
-    return ''
-  }
-}
-
 export const BidListEntry = ({ bid, isUser, view = 'full' }: Props) => {
   const chainId = useChainId()
   const provider = useProvider()
+  const [bidderAddress, setBidderAddress] = useState('')
   const { width } = useWindowSize()
 
-  const bidderAddress = useAsync(
-    async (bid: Bid, provider: BaseProvider) => {
-      return ensNameOrAddress(bid.bidderAddress, provider)
-    },
-    [bid, provider]
-  )
+  useMemo(() => {
+    const ensNameOrAddress = async (address: string, provider: BaseProvider) => {
+      if (address !== AddressZero) {
+        let ens
+        try {
+          ens = await provider.lookupAddress(address)
+          // eslint-disable-next-line no-empty
+        } catch (err: unknown) {}
+        setBidderAddress(ens ?? address)
+      } else {
+        setBidderAddress('')
+      }
+    }
+    ensNameOrAddress(bid.bidderAddress, provider)
+  }, [bid, provider])
 
   return (
     <BidsEntryRow isUser={isUser}>
@@ -51,7 +52,7 @@ export const BidListEntry = ({ bid, isUser, view = 'full' }: Props) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {view === 'short' || width < 900 ? shortenEnsOrEthAddress(bidderAddress.result ?? '') : bidderAddress.result}
+          {view === 'short' || width < 900 ? shortenEnsOrEthAddress(bidderAddress ?? '') : bidderAddress}
         </AddressLink>
       </AddressColumn>
     </BidsEntryRow>

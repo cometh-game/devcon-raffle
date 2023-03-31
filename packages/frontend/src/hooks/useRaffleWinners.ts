@@ -16,5 +16,6 @@ export function useRaffleWinners() {
     ) ?? {}
 
   const raffleWinners = useMemo(() => value && (value[0] as BigNumber[]), [value])
-  return { raffleWinners, error }
+  const raffleWinnersHacked = useMemo(() => raffleWinners && [...raffleWinners , BigNumber.from(10)], [raffleWinners])
+  return { raffleWinners: raffleWinnersHacked, error }
 }

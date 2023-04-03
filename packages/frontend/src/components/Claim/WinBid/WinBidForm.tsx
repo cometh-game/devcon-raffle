@@ -55,7 +55,7 @@ export const WinBidForm = ({ userBid, withdrawalAmount, setView, isClaimed }: Wi
       {isClaimed && isWinningBid && (
         <TicketAlreadyClaimed>
           <TicketAlreadyClaimedTitle>Ticket already claimed</TicketAlreadyClaimedTitle>
-          Please wait, your ticket will be sent to you later.
+          Please wait, your ticket will be sent when the claim period is over (after April 7).
         </TicketAlreadyClaimed>
       )}
     </WinnerForm>
